@@ -1393,7 +1393,7 @@
 //                                                                                 //
 /////////////////////////////////////////////////////////////////////////////////////
 
-[Type] == "Gilded Bestiary Scarab" # [StashItem] == "true"
+[Type] == "Bestiary Scarab" # [StashItem] == "true"
 [Type] == "Gilded Divination Scarab" # [StashItem] == "true"
 [Type] == "Gilded Legion Scarab" # [StashItem] == "true"
 [Type] == "Gilded Sulphite Scarab" # [StashItem] == "true"
@@ -1488,6 +1488,23 @@
 [Type] == "Primal Delirium Orb" 	# [StashItem] == "true"
 [Type] == "Simulacrum Splinter" 	# [StashItem] == "true"
 [Type] == "Simulacrum" 			# [StashItem] == "true"
+
+/////////////////////////////////////////////////////////////////////////////////////
+//                                                                                 //
+//                           Delve                                                 //
+//                                                                                 //
+/////////////////////////////////////////////////////////////////////////////////////
+
+[Type] == "Potent Alchemical Resonator" # [StashItem] == "true"
+[Type] == "Potent Chaotic Resonator" # [StashItem] == "true"
+[Type] == "Powerful Alchemical Resonator" # [StashItem] == "true"
+[Type] == "Powerful Chaotic Resonator" # [StashItem] == "true"
+[Type] == "Prime Alchemical Resonator" # [StashItem] == "true"
+[Type] == "Prime Chaotic Resonator" # [StashItem] == "true"
+[Type] == "Primitive Alchemical Resonator" # [StashItem] == "true"
+[Type] == "Primitive Chaotic Resonator" # [StashItem] == "true"
+
+
 
 /////////////////////////////////////////////////////////////////////////////////////
 //                                                                                 //
@@ -2031,6 +2048,13 @@
 [Type] == "Spiraled Wand" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Reverberation Rod
 [Type] == "Tornado Wand" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Piscator's Vigil / Shimmeron
 
+//////////////////////////////////////////////
+//                                          //
+//                Flasks                    //
+//                                          //
+//////////////////////////////////////////////
+
+
 // Life/Mana Flasks
 // [Type] == "Sanctified Life Flask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Blood of the Karui
 // Type] == "Grand Mana Flask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Zerphi's Last Breath
@@ -2052,25 +2076,27 @@
 // [Type] == "Stibnite Flask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Witchfire Brew Stibnite Flask / Sin's REbirth
 [Type] == "Sulphur Flask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // The Sorrow of the Divine / The Overflowing Chalice
 // [Type] == "Topaz Flask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Vessel of Vinktar
-m] == "true" // Vessel of Vinktar
-ied Life Flask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Blood of the Karui
-// Type] == "Grand Mana Flask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Zerphi's Last Breath
-[Type] == "Greater Mana Flask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Doedre's Elixir
-[Type] == "Hallowed Hybrid Flask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // The Writhing Jar
-// [Type] == "Sanctified Mana Flask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Lavianga's Spirit
-[Type] == "Large Hybrid Flask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Divination Distillate
-
-// Utility Flasks
-[Type] == "Amethyst Flask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Atziri's Promise
-[Type] == "Diamond Flask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Coralito's Signature 
-// [Type] == "Granite Flask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Lion's Roar / Rumi's Concoction 
-[Type] == "Granite Flask" && [Rarity] == "Unique" # [local_unique_flask_b
+// [Type] == "Sanctified Life Flask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Blood of the Karui
+// Type] == "Grand Mana Flask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Zerphi's Last Breath
+[Type] == "Greater Mana Flask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Doedre's Elixir
+[Type] == "Hallowed Hybrid Flask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // The Writhing Jar
+// [Type] == "Sanctified Mana Flask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Lavianga's Spirit
+[Type] == "Large Hybrid Flask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Divination Distillate
 
+
+
+// Utility Flasks
+
+[Type] == "Amethyst Flask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Atziri's Promise
+
+[Type] == "Diamond Flask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Coralito's Signature 
+
+// [Type] == "Granite Flask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Lion's Roar / Rumi's Concoction 
 
 
 //////////////////////////////////////////////
 //                                          //
-//                Seeds        //
+//                Harvest                   //
 //                                          //
 //////////////////////////////////////////////
 
@@ -2131,9 +2157,11 @@ ied Life Flask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Blood of 
 
 /////////////////////////////////////////////////////////////////////////////////////
 //                                                                                 //
-//                            CATALYSTS                                 	   //
+//                            CATALYSTS                                 	          //
 //                                                                                 //
 /////////////////////////////////////////////////////////////////////////////////////
+
+
 [Type] == "Prismatic Catalyst" # [StashItem] == "true"
 [Type] == "Imbued Catalyst" # [StashItem] == "true"
 [Type] == "Abrasive Catalyst" # [StashItem] == "true"
@@ -2143,15 +2171,13 @@ ied Life Flask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Blood of 
 [Type] == "Fertile Catalyst" # [StashItem] == "true"
 
 
-
-
-
-4:28
 /////////////////////////////////////////////////////////////////////////////////////
 //                                                                                 //
-//                            INCUBATORS                                 	   //
+//                            INCUBATORS                                       	   //
 //                                                                                 //
 /////////////////////////////////////////////////////////////////////////////////////
+
+
 [Type] == "Abyssal Incubator" # [StashItem] == "true"
 [Type] == "Geomancer's Incubator" # [StashItem] == "true"
 [Type] == "Celestial Armorsmith's Incubator" # [StashItem] == "true"
@@ -2180,155 +2206,11 @@ ied Life Flask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Blood of 
 [Type] == "Singular Incubator" # [StashItem] == "true"
 [Type] == "Celestial Blacksmith's Incubator" # [StashItem] == "true"
 
-
-// Harvest Stuff
-[Type] == "Wild Ursaling Seed" # [StashItem] == "true"
-[Type] == "Wild Hellion Seed" # [StashItem] == "true"
-[Type] == "Wild Thornwolf Seed" # [StashItem] == "true"
-[Type] == "Wild Ape Seed" # [StashItem] == "true"
-[Type] == "Wild Hatchling Seed" # [StashItem] == "true"
-[Type] == "Wild Bristlebeast Grain" # [StashItem] == "true"
-[Type] == "Wild Snap Hound Grain" # [StashItem] == "true"
-[Type] == "Wild Homunculus Grain" # [StashItem] == "true"
-[Type] == "Wild Chieftain Grain" # [StashItem] == "true"
-[Type] == "Wild Spikeback Grain" # [StashItem] == "true"
-[Type] == "Wild Bristle Matron Bulb" # [StashItem] == "true"
-[Type] == "Wild Hellion Alpha Bulb" # [StashItem] == "true"
-[Type] == "Wild Brambleback Bulb" # [StashItem] == "true"
-[Type] == "Wild Infestation Queen Bulb" # [StashItem] == "true"
-[Type] == "Wild Thornfruit" # [StashItem] == "true"
-[Type] == "Vivid Arachnid Seed" # [StashItem] == "true"
-[Type] == "Vivid Weta Seed" # [StashItem] == "true"
-[Type] == "Vivid Leech Seed" # [StashItem] == "true"
-[Type] == "Vivid Scorpion Seed" # [StashItem] == "true"
-[Type] == "Vivid Thornweaver Seed" # [StashItem] == "true"
-[Type] == "Vivid Razorleg Grain" # [StashItem] == "true"
-[Type] == "Vivid Sapsucker Grain" # [StashItem] == "true"
-[Type] == "Vivid Parasite Grain" # [StashItem] == "true"
-[Type] == "Vivid Striketail Grain" # [StashItem] == "true"
-[Type] == "Vivid Nestback Grain" # [StashItem] == "true"
-[Type] == "Vivid Whipleg Bulb" 	# [StashItem] == "true"
-[Type] == "Vivid Watcher Bulb" 	# [StashItem] == "true"
-[Type] == "Vivid Vulture Bulb" 	# [StashItem] == "true"
-[Type] == "Vivid Abberarach Bulb" # [StashItem] == "true"
-[Type] == "Vivid Devourer Bulb" # [StashItem] == "true"
-[Type] == "Vivid Scalefruit" # [StashItem] == "true"
-[Type] == "Primal Rhoa Seed" # [StashItem] == "true"
-[Type] == "Primal Dustspitter Seed" # [StashItem] == "true"
-[Type] == "Primal Feasting Horror Seed" # [StashItem] == "true"
-[Type] == "Primal Maw Seed" # [StashItem] == "true"
-[Type] == "Primal Cleaveling Seed" # [StashItem] == "true"
-[Type] == "Primal Rhex Grain" # [StashItem] == "true"
-[Type] == "Primal Dustcrab Grain" # [StashItem] == "true"
-[Type] == "Primal Viper Grain" # [StashItem] == "true"
-[Type] == "Primal Chimeral Grain" # [StashItem] == "true"
-[Type] == "Primal Scrabbler Grain" # [StashItem] == "true"
-// Delirium Stuff
-[Type] == "Skittering Delirium Orb" # [StashItem] == "true"
-[Type] == "Blighted Delirium Orb" # [StashItem] == "true"
-[Type] == "Diviner's Delirium Orb" # [StashItem] == "true"
-[Type] == "Thaumaturge's Delirium Orb" # [StashItem] == "true"
-[Type] == "Cartographer's Delirium Orb" # [StashItem] == "true"
-[Type] == "Fine Delirium Orb" # [StashItem] == "true"
-[Type] == "Fossilised Delirium Orb" # [StashItem] == "true"
-[Type] == "Timeless Delirium Orb" # [StashItem] == "true"
-[Type] == "Obscured Delirium Orb" # [StashItem] == "true"
-[Type] == "Foreboding Delirium Orb" # [StashItem] == "true"
-[Type] == "Fragmented Delirium Orb" # [StashItem] == "true"
-[Type] == "Amorphous Delirium Orb" # [StashItem] == "true"
-[Type] == "Singular Delirium Orb" # [StashItem] == "true"
-[Type] == "Abyssal Delirium Orb" # [StashItem] == "true"
-[Type] == "Blacksmith's Delirium Orb" # [StashItem] == "true"
-[Type] == "Decadent Delirium Orb" # [StashItem] == "true"
-[Type] == "Imperial Delirium Orb" # [StashItem] == "true"
-[Type] == "Portentous Delirium Orb" # [StashItem] == "true"
-[Type] == "Primal Delirium Orb" # [StashItem] == "true"
-[Type] == "Whispering Delirium Orb" # [StashItem] == "true"
-[Type] == "Armoursmith's Delirium Orb" # [StashItem] == "true"
-[Type] == "Jeweller's Delirium Orb" # [StashItem] == "true"
-// Fossils and Resonators
-// [Type] == "Aberrant Fossil" # [StashItem] == "true"
-// [Type] == "Aetheric Fossil" # [StashItem] == "true"
-[Type] == "Bloodstained Fossil" # [StashItem] == "true"
-// [Type] == "Bound Fossil" # [StashItem] == "true"
-// [Type] == "Corroded Fossil" # [StashItem] == "true"
-// [Type] == "Dense Fossil" # [StashItem] == "true"
-// [Type] == "Enchanted Fossil" # [StashItem] == "true"
-// [Type] == "Encrusted Fossil" # [StashItem] == "true"
-[Type] == "Faceted Fossil" # [StashItem] == "true"
-[Type] == "Fractured Fossil" # [StashItem] == "true"
-// [Type] == "Frigid Fossil" # [StashItem] == "true"
-// [Type] == "Gilded Fossil" # [StashItem] == "true"
-[Type] == "Glyphic Fossil" # [StashItem] == "true"
-[Type] == "Hollow Fossil" # [StashItem] == "true"
-// [Type] == "Jagged Fossil" # [StashItem] == "true"
-// [Type] == "Lucent Fossil" # [StashItem] == "true"
-// [Type] == "Metallic Fossil" # [StashItem] == "true"
-// [Type] == "Perfect Fossil" # [StashItem] == "true"
-// [Type] == "Prismatic Fossil" # [StashItem] == "true"
-// [Type] == "Pristine Fossil" # [StashItem] == "true"
-[Type] == "Sanctified Fossil" # [StashItem] == "true"
-// [Type] == "Scorched Fossil" # [StashItem] == "true"
-// [Type] == "Serrated Fossil" # [StashItem] == "true"
-// [Type] == "Shuddering Fossil" # [StashItem] == "true"
-[Type] == "Tangled Fossil" # [StashItem] == "true"
-[Type] == "Potent Alchemical Resonator" # [StashItem] == "true"
-[Type] == "Potent Chaotic Resonator" # [StashItem] == "true"
-[Type] == "Powerful Alchemical Resonator" # [StashItem] == "true"
-[Type] == "Powerful Chaotic Resonator" # [StashItem] == "true"
-[Type] == "Prime Alchemical Resonator" # [StashItem] == "true"
-[Type] == "Prime Chaotic Resonator" # [StashItem] == "true"
-[Type] == "Primitive Alchemical Resonator" # [StashItem] == "true"
-[Type] == "Primitive Chaotic Resonator" # [StashItem] == "true"
-
-// Scarabs
-
-[Type] == "Gilded Ambush Scarab" # [StashItem] == "true"
-[Type] == "Gilded Bestiary Scarab" # [StashItem] == "true"
-[Type] == "Gilded Breach Scarab" # [StashItem] == "true"
-[Type] == "Gilded Cartography Scarab" # [StashItem] == "true"
-[Type] == "Gilded Divination Scarab" # [StashItem] == "true"
-[Type] == "Gilded Elder Scarab" # [StashItem] == "true"
-[Type] == "Gilded Harbinger Scarab" # [StashItem] == "true"
-[Type] == "Gilded Legion Scarab" # [StashItem] == "true"
-[Type] == "Gilded Metamorph Scarab" # [StashItem] == "true"
-[Type] == "Gilded Perandus Scarab" # [StashItem] == "true"
-[Type] == "Gilded Reliquary Scarab" # [StashItem] == "true"
-[Type] == "Gilded Shaper Scarab" # [StashItem] == "true"
-[Type] == "Gilded Sulphite Scarab" # [StashItem] == "true"
-[Type] == "Gilded Torment Scarab" # [StashItem] == "true"
-[Type] == "Polished Ambush Scarab" # [StashItem] == "true"
-[Type] == "Polished Bestiary Scarab" # [StashItem] == "true"
-[Type] == "Polished Breach Scarab" # [StashItem] == "true"
-[Type] == "Polished Cartography Scarab" # [StashItem] == "true"
-[Type] == "Polished Divination Scarab" # [StashItem] == "true"
-[Type] == "Polished Elder Scarab" # [StashItem] == "true"
-[Type] == "Polished Harbinger Scarab" # [StashItem] == "true"
-[Type] == "Polished Legion Scarab" # [StashItem] == "true"
-[Type] == "Polished Metamorph Scarab" # [StashItem] == "true"
-[Type] == "Polished Perandus Scarab" # [StashItem] == "true"
-[Type] == "Polished Reliquary Scarab" # [StashItem] == "true"
-[Type] == "Polished Shaper Scarab" # [StashItem] == "true"
-[Type] == "Polished Sulphite Scarab" # [StashItem] == "true"
-[Type] == "Polished Torment Scarab" # [StashItem] == "true"
-[Type] == "Rusted Ambush Scarab" # [StashItem] == "true"
-[Type] == "Rusted Bestiary Scarab" # [StashItem] == "true"
-[Type] == "Rusted Breach Scarab" # [StashItem] == "true"
-[Type] == "Rusted Cartography Scarab" # [StashItem] == "true"
-[Type] == "Rusted Divination Scarab" # [StashItem] == "true"
-[Type] == "Rusted Elder Scarab" # [StashItem] == "true"
-[Type] == "Rusted Harbinger Scarab" # [StashItem] == "true"
-[Type] == "Rusted Legion Scarab" # [StashItem] == "true"
-[Type] == "Rusted Metamorph Scarab" # [StashItem] == "true"
-[Type] == "Rusted Perandus Scarab" # [StashItem] == "true"
-[Type] == "Rusted Reliquary Scarab" # [StashItem] == "true"
-[Type] == "Rusted Shaper Scarab" # [StashItem] == "true"
-[Type] == "Rusted Sulphite Scarab" # [StashItem] == "true"
-[Type] == "Rusted Torment Scarab" # [StashItem] == "true"
-
-
-// Splinters
-
+/////////////////////////////////////////////////////////////////////////////////////
+//                                                                                 //
+//                            Splinters                                        	   //
+//                                                                                 //
+/////////////////////////////////////////////////////////////////////////////////////
 
 [Type] == "Timeless Eternal Empire Splinter" # [StashItem] == "true"
 [Type] == "Timeless Karui Splinter" # [StashItem] == "true"
@@ -2338,7 +2220,12 @@ ied Life Flask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Blood of 
 [Type] == "Simulacrum Splinter" # [StashItem] == "true"
 
 
-// Prophecies
+/////////////////////////////////////////////////////////////////////////////////////
+//                                                                                 //
+//                            Prophecies                                       	   //
+//                                                                                 //
+/////////////////////////////////////////////////////////////////////////////////////
+
 
 
 [Type] == "Trash to Treasure" # [StashItem] == "true"
@@ -2351,44 +2238,11 @@ ied Life Flask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Blood of 
 [Type] == "Last of the Wildmen" # [StashItem] == "true"
 
 
-// Incubators
-
-
-[Type] == "Gemcutter's Incubator" # [StashItem] == "true"
-[Type] == "Time" # [StashItem] == "true"
-[Type] == "Geomancer's Incubator" # [StashItem] == "true"
-[Type] == "Skittering Incubator" # [StashItem] == "true"
-[Type] == "Abyssal Incubator" # [StashItem] == "true"
-[Type] == "Enchanted Incubator" # [StashItem] == "true"
-[Type] == "Thaumaturge's Incubator" # [StashItem] == "true"
-[Type] == "Diviner's Incubator" # [StashItem] == "true"
-[Type] == "Otherworldly Incubator" # [StashItem] == "true"
-[Type] == "Fragmented Incubator" # [StashItem] == "true"
-[Type] == "Mysterious Incubator" # [StashItem] == "true"
-[Type] == "Fossilised Incubator" # [StashItem] == "true"
-[Type] == "Cartographer's Incubator" # [StashItem] == "true"
-[Type] == "Foreboding Incubator" # [StashItem] == "true"
-[Type] == "Obscured Incubator" # [StashItem] == "true"
-[Type] == "Ornate Incubator" # [StashItem] == "true"
-
-
-// Sextants
-
-
-[Type] == "Simple Sextant" # [StashItem] == "ture"
-[Type] == "Prime Sextant" # [StashItem] == "ture"
-[Type] == "Awakened Sextant" # [StashItem] == "ture"
-
-
-// Catalysts
-
-
-[Type] == "Tempering Catalyst" # [StashItem] == "true"
-[Type] == "Fertile Catalyst" # [StashItem] == "true"
-[Type] == "Prismatic Catalyst" # [StashItem] == "true"
-
-
-// Oils
+/////////////////////////////////////////////////////////////////////////////////////
+//                                                                                 //
+//                           Oils                                      	   //
+//                                                                                 //
+/////////////////////////////////////////////////////////////////////////////////////
 
 
 [Type] == "Golden Oil" # [StashItem] == "true"
