@@ -1,0 +1,2179 @@
+// Custom pickit by pincette, ver.1.00
+
+// You'll find the item names list in the ItemNameList.txt file, in the main bot folder, if some name are missing, please send them to us in pm and I'll add them to upcoming versions.
+// You'll find the mods list in the ModsList.html file, in the main bot folder, remember to only use expressions from the right (ie. local_minimum_added_physical_damage, base_maximum_energy_shield, ...). 
+// All uniques should now be listed within the Pickit for easy commenting and uncommenting.  All uniques valued 1ex+ should be by default uncommented.
+
+// There are several special mods here to make pickit maker's life easier:
+// [TotalResistances] that will make the bot sum all resistances on each item and compare them to the value (ie. [Category] == "Helm" # [TotalResistances] > "50", to keep every helm that has more than 50 sum up resistance value.  
+// [DPS] that will make the bot compute the dps of any weapon and compare it to the value (ie. [Category] == "1Handed" # [DPS] >= "250").
+// [Elemental DPS] that will make the bot compute ONLY the elemental dps of any weapon and compare it to the value (ie. [Category] == "1Handed" # [Elemental DPS] >= "200").
+// [Physical DPS] that will make the bot compute ONLY the physical dps of any weapon and compare it to the value (ie. [Category] == "1Handed" # [Physical DPS] >= "250").
+// [TotalSpellElementalDamage] that will make bot compute the total added spell damage and elemental damage from an item (in %).
+// [TotalFireSpellDamage] that will make bot compute the total added fire spell damage from an item (including spell damage) (in %).
+// [TotalColdSpellDamage] that will make bot compute the total added cold spell damage from an item (including spell damage) (in %).
+// [TotalLightningSpellDamage] that will make bot compute the total added lightning spell damage from an item (including spell damage) (in %).
+// Expressions to the left are only here to help you choosing the right ones
+
+// Syntax is: [Key] operator "Value"
+// Key could be replaced by any of the following list, operator could be ==, <=, >=, <, > and Value could be any corresponding value (ie. a number if type is Quality)
+// Key List: Type, ItemLevel, MapTier, Armor, Evasion, Energy Shield, Computed Armor, Computed Evasion, Computed Energy Shield, Rarity, Quality, Sockets, Linked, and all the mods found in ModsList.html file.
+// You can use a mod by its index (if it is not in the ModsList.txt file) this way [modindex] == "value", ie. [587] == "30" for +30 int mod. Press F7 to dump inventory and find mod indexes.
+// Flags that can be used are : [StashItem] == "true", [StashUnid] == "true", [SellItem] == "true", [SellUnid] == "true". Please note that [SellItem] tag will ALWAYS make the bot identify item.
+// About Key Rarity, only operators == and != can be used and possible values are: "Normal", "Magic", "Rare", "Unique".
+// You can use different equipment categories as well, possible values: "Chest", "Shield", "Helm", "Ring", "Amulet", "Flask", "Weapon", "1Handed", "2Handed", "Gloves", "Boots", "Belt", "Map", "Jewel", "Talisman", "Card", "Leaguestone", "Prophecy", "Fossil", "Organ".
+// Operators && and || are available, parenthesis are working.
+// # is used to separate mods checked after item identification. If an item matchs mods before the # and doesn't match the ones after, it will be sold to vendor.
+// If you didn't noticed, // is used for comments.
+
+// /!\ Be careful!!! local_ mod name means that the mods is applied on the stats of the items rather than the stats of your char. local_attack_speed_+% for instance is applied on the weapon only
+// and attack_speed_+% is global on the character (ring,amy,belt...) /!\
+
+// If you want to chance an item, simply add for instance [Type] == "Glorious Plate" # [ChanceItem] == "true", to make the bot pickup any glorious plate it find and use an orb of chance on it (Kaom's Heart FTW).
+// Be careful, if you set up the Glorious Plate to be Chanced, no need to add any line for the bot to pick up the white item or sell magic and rare. Just setup [Type] == "Your Item" # [ChanceItem] == "true" and the bot will do the rest.
+
+// Thanks to jps42 for his help in building this pickit file.
+// Thanks to Sexuation for completely re-working the rare section.
+// Thanks to Madbishep for reviewing/correcting stuff.
+// You can check his post here : https://exiled-bot.net/community/index.php/topic/6329-helpful-pickit-additional-lines-chaosregal-recipe-talisman/
+
+
+/////////////////////////////////////////////////////////////////////////////////////
+//                                                                                 //
+//                                 EXAMPLE                                         //
+//                                                                                 //
+/////////////////////////////////////////////////////////////////////////////////////
+
+// Blanket coverage
+// [Category] == "Gloves" && [Rarity] == "Rare" # [SellItem] == "true"
+// What it means : Pick up any gloves. Id the item. Then Sell it.
+// Exception handling
+// [Category] == "Gloves" && [Rarity] == "Rare" # [attack_speed_+%] >= "10" && [StashItem] == "true"
+// What it means : When the gloves are Identified, if they have an attack speed modifier  above a 10% value, it will stash the item.
+// [Type] == "Short Bow" && [Rarity] == "Unique" && [Quality] >= "10"
+// [Type] == "Occultist's Vestment" && [Rarity] == "Unique"
+// [Type] == "Engraved Wand" # [attack_minimum_added_physical_damage]>="10" && [accuracy_rating_+%]=="100" 
+// [Type] == "Medium Life Flask"
+// [Category] == "Chest" && [Rarity] == "Rare" # [base_maximum_life] >= "80" && [base_cold_damage_resistance_%] >= "25"
+// [Category] == "Helm" && [Rarity] == "Rare" # [StashItem] == "true" && [base_maximum_life] >= "80" && [base_lightning_damage_resistance_%] >= "25" && [base_cold_damage_resistance_%] >= "25"
+
+/////////////////////////////////////////////////////////////////////////////////////
+//                                                                                 //
+//                                 B O O K M A R K                                 //
+//                                                                                 //
+/////////////////////////////////////////////////////////////////////////////////////
+//
+//Example
+//Bookmark
+//User's custom rules
+//Currency
+//Chaos/Regal Recipe
+//Harbinger
+//Breach
+//Essences
+//Talisman
+//Gems
+//Cards
+//Maps
+//Sockets
+//Chancing
+//Whites
+//Jewels
+//Unique items
+//
+/////////////////////////////////////////////////////////////////////////////////////
+//                                                                                 //
+//                             User's custom rules                                 //
+//                                                                                 //
+/////////////////////////////////////////////////////////////////////////////////////
+
+// Add any custom lines here
+// [Category] == "Flask" && [Quality] == "20"  # [SellItem] == "true"  /// Glassblower's Bauble farm
+// [Category] == "Flask" && [Quality] >= "13" # [StashItem] == "true"  // 3 Flasks = Glassblower's
+// [Type] == "Quicksilver Flask" && [Rarity] == "Magic" # [local_flask_movement_speed_+%_while_healing] >= "20" && [StashItem] == "true" // Double MS
+// [Type] == "Stone Hammer" && [Rarity] == "Normal" // Q20 + Map = Chisel
+// [Type] == "Rock Breaker" && [Rarity] == "Normal" // Q20 + Map = Chisel
+// [Type] == "Gavel" && [Rarity] == "Normal"  // Q20 + Map = Chisel
+// [Type] == "Iron Ring"  // 7 Rings (any rarity) + Coral/Paua Rare Ring = Rare Ammy
+
+// ============================= Metamorph currency =============================
+
+[Type] == "*Brain" # [StashItem] == "true"
+[Type] == "*Eye" # [StashItem] == "true"
+[Type] == "*Lung" # [StashItem] == "true"
+[Type] == "*Heart" # [StashItem] == "true"
+[Type] == "*Liver" # [StashItem] == "true"
+
+// ============================= Harvest currency =============================
+[Type] == "Wild Ursaling Seed" # [StashItem] == "true"
+[Type] == "Wild Hellion Seed" # [StashItem] == "true"
+[Type] == "Wild Thornwolf Seed" # [StashItem] == "true"
+[Type] == "Wild Ape Seed" # [StashItem] == "true"
+[Type] == "Wild Hatchling Seed" # [StashItem] == "true"
+[Type] == "Wild Bristlebeast Grain" # [StashItem] == "true"
+[Type] == "Wild Snap Hound Grain" # [StashItem] == "true"
+[Type] == "Wild Homunculus Grain" # [StashItem] == "true"
+[Type] == "Wild Chieftain Grain" # [StashItem] == "true"
+[Type] == "Wild Spikeback Grain" # [StashItem] == "true"
+[Type] == "Wild Bristle Matron Bulb" # [StashItem] == "true"
+[Type] == "Wild Hellion Alpha Bulb" # [StashItem] == "true"
+[Type] == "Wild Brambleback Bulb" # [StashItem] == "true"
+[Type] == "Wild Infestation Queen Bulb" # [StashItem] == "true"
+[Type] == "Wild Thornfruit" # [StashItem] == "true"
+[Type] == "Vivid Arachnid Seed" # [StashItem] == "true"
+[Type] == "Vivid Weta Seed" # [StashItem] == "true"
+[Type] == "Vivid Leech Seed" # [StashItem] == "true"
+[Type] == "Vivid Scorpion Seed" # [StashItem] == "true"
+[Type] == "Vivid Thornweaver Seed" # [StashItem] == "true"
+[Type] == "Vivid Razorleg Grain" # [StashItem] == "true"
+[Type] == "Vivid Sapsucker Grain" # [StashItem] == "true"
+[Type] == "Vivid Parasite Grain" # [StashItem] == "true"
+[Type] == "Vivid Striketail Grain" # [StashItem] == "true"
+[Type] == "Vivid Nestback Grain" # [StashItem] == "true"
+[Type] == "Vivid Whipleg Bulb" 	# [StashItem] == "true"
+[Type] == "Vivid Watcher Bulb" 	# [StashItem] == "true"
+[Type] == "Vivid Vulture Bulb" 	# [StashItem] == "true"
+[Type] == "Vivid Abberarach Bulb" # [StashItem] == "true"
+[Type] == "Vivid Devourer Bulb" # [StashItem] == "true"
+[Type] == "Vivid Scalefruit" # [StashItem] == "true"
+[Type] == "Primal Rhoa Seed" # [StashItem] == "true"
+[Type] == "Primal Dustspitter Seed" # [StashItem] == "true"
+[Type] == "Primal Feasting Horror Seed" # [StashItem] == "true"
+[Type] == "Primal Maw Seed" # [StashItem] == "true"
+[Type] == "Primal Cleaveling Seed" # [StashItem] == "true"
+[Type] == "Primal Rhex Grain" # [StashItem] == "true"
+[Type] == "Primal Dustcrab Grain" # [StashItem] == "true"
+[Type] == "Primal Viper Grain" # [StashItem] == "true"
+[Type] == "Primal Chimeral Grain" # [StashItem] == "true"
+[Type] == "Primal Scrabbler Grain" # [StashItem] == "true"
+
+// ============================= Blight currency ============================= 
+// Oils
+[Type] == "Golden Oil" # [StashItem] == "true"
+[Type] == "Silver Oil" # [StashItem] == "true"
+[Type] == "Opalescent Oil" # [StashItem] == "true"
+[Type] == "Crimson Oil" # [StashItem] == "true"
+[Type] == "Black Oil" # [StashItem] == "true"
+[Type] == "Azure Oil" # [StashItem] == "true"
+[Type] == "Violet Oil" # [StashItem] == "true"
+
+// Catalysts
+[Type] == "Abrasive Catalyst" # [StashItem] == "true"
+[Type] == "Fertile Catalyst" # [StashItem] == "true"
+[Type] == "Imbued Catalyst" # [StashItem] == "true"
+[Type] == "Intrinsic Catalyst" # [StashItem] == "true"
+[Type] == "Prismatic Catalyst" # [StashItem] == "true"
+[Type] == "Tempering Catalyst" # [StashItem] == "true"
+[Type] == "Turbulent Catalyst" # [StashItem] == "true"
+
+// ============================= Legion currency ============================= 
+[Type] == "Timeless Eternal Empire Splinter" # [StashItem] == "true"
+[Type] == "Timeless Karui Splinter" # [StashItem] == "true"
+[Type] == "Timeless Maraketh Splinter" # [StashItem] == "true"
+[Type] == "Timeless Templar Splinter" # [StashItem] == "true"
+[Type] == "Timeless Vaal Splinter" # [StashItem] == "true"
+
+[Type] == "Timeless Eternal Emblem" # [StashItem] == "true"
+[Type] == "Timeless Karui Emblem" # [StashItem] == "true"
+[Type] == "Timeless Maraketh Emblem" # [StashItem] == "true"
+[Type] == "Timeless Templar Emblem" # [StashItem] == "true"
+[Type] == "Timeless Vaal Emblem" # [StashItem] == "true"
+
+// ============================= Breachstones ============================= 
+[Type] == "Xoph's Breachstone" # [StashItem] == "true"
+[Type] == "Xoph's Charged Breachstone" # [StashItem] == "true"
+[Type] == "Xoph's Enriched Breachstone" # [StashItem] == "true"
+[Type] == "Xoph's Pure Breachstone" # [StashItem] == "true"
+[Type] == "Tul's Breachstone" # [StashItem] == "true"
+[Type] == "Tul's Charged Breachstone" # [StashItem] == "true"
+[Type] == "Tul's Enriched Breachstone" # [StashItem] == "true"
+[Type] == "Tul's Pure Breachstone" # [StashItem] == "true"
+[Type] == "Esh's Breachstone" # [StashItem] == "true"
+[Type] == "Esh's Charged Breachstone" # [StashItem] == "true"
+[Type] == "Esh's Enriched Breachstone" # [StashItem] == "true"
+[Type] == "Esh's Pure Breachstone" # [StashItem] == "true"
+[Type] == "Uul-Netol's Breachstone" # [StashItem] == "true"
+[Type] == "Uul-Netol's Charged Breachstone" # [StashItem] == "true"
+[Type] == "Uul-Netol's Enriched Breachstone" # [StashItem] == "true"
+[Type] == "Uul-Netol's Pure Breachstone" # [StashItem] == "true"
+[Type] == "Chayula's Breachstone" # [StashItem] == "true"
+[Type] == "Chayula's Charged Breachstone" # [StashItem] == "true"
+[Type] == "Chayula's Enriched Breachstone" # [StashItem] == "true"
+[Type] == "Chayula's Pure Breachstone" # [StashItem] == "true"
+
+// ============================= Selling Rare jewelry ============================= 
+// [Category] == "Belt" && [Rarity] == "Rare" # [SellItem] == "true"
+// [Category] == "Ring" && [Rarity] == "Rare" # [SellItem] == "true"
+// [Category] == "Amulet" && [Rarity] == "Rare" # [SellItem] == "true"
+
+// ============================= Jewels ============================= 
+// [Category] == "Jewel" && [Rarity] == "Rare" # [maximum_life_+%]>= "5" && [StashItem] == "true"
+// [Category] == "Jewel" && [Rarity] == "Rare" # [base_maximum_life] >= "30" && [StashItem] == "true"
+// [Type] == "Cobalt Jewel" # [StashItem] == "true"
+// [Type] == "Crimson Jewel" # [StashItem] == "true"
+// [Type] == "Viridian Jewel" # [StashItem] == "true"
+
+// ============================= Nice jewelry ============================= 
+// [Category] == "Belt" && [Rarity] == "Rare" # [TotalResistances] >= "90" && [StashItem] == "true"
+// [Category] == "Ring" && [Rarity] == "Rare" # [TotalResistances] >= "80" && [StashItem] == "true"
+// [Category] == "Amulet" && [Rarity] == "Rare" # [TotalResistances] >= "80" && [StashItem] == "true"
+
+/////////////////////////////////////////////////////////////////////////////////////
+//                                                                                 //
+//                                  CURRENCY                                       //
+//                                                                                 //
+/////////////////////////////////////////////////////////////////////////////////////
+
+// Shards
+[Type] == "Alchemy Shard" # [StashItem] == "true"
+[Type] == "Alteration Shard" # [StashItem] == "true"
+[Type] == "Scroll Fragment" # [StashItem] == "true"
+[Type] == "Transmutation Shard" # [StashItem] == "true"
+
+// Scrolls commented so instead of picking every scroll it will keep number of scroll setup by user in inventory
+// [Type] == "Scroll of Wisdom" # [StashItem] == "true" // Take all id scroll
+// [Type] == "Portal Scroll" # [StashItem] == "true" // Take all tp scroll
+[Type] == "Blacksmith's Whetstone" # [StashItem] == "true" // Take Blacksmith's Whetstone
+[Type] == "Armourer's Scrap" # [StashItem] == "true" // Take Armourer's Scrap
+[Type] == "Glassblower's Bauble" # [StashItem] == "true" // Take Glassblower's Bauble
+[Type] == "Blessed Orb" # [StashItem] == "true"
+[Type] == "Chaos Orb" # [StashItem] == "true"
+[Type] == "Chromatic Orb" # [StashItem] == "true"
+[Type] == "Divine Orb" # [StashItem] == "true"
+[Type] == "Exalted Orb" # [StashItem] == "true"
+[Type] == "Gemcutter's Prism" # [StashItem] == "true"
+[Type] == "Jeweller's Orb" # [StashItem] == "true"
+[Type] == "Mirror of Kalandra" # [StashItem] == "true"
+[Type] == "Orb of Alchemy" # [StashItem] == "true"
+[Type] == "Orb of Alteration" # [StashItem] == "true"
+[Type] == "Orb of Augmentation" # [StashItem] == "true"
+[Type] == "Orb of Chance" # [StashItem] == "true"
+[Type] == "Orb of Fusing" # [StashItem] == "true"
+[Type] == "Orb of Regret" # [StashItem] == "true"
+[Type] == "Orb of Scouring" # [StashItem] == "true"
+[Type] == "Orb of Transmutation" # [StashItem] == "true"
+[Type] == "Perandus Coin" # [StashItem] == "true"
+[Type] == "Regal Orb" # [StashItem] == "true"
+[Type] == "Silver Coin" # [StashItem] == "true"
+[Type] == "Vaal Orb" # [StashItem] == "true"
+
+[Type] == "Apprentice Cartographer's Seal" # [StashItem] == "true"
+[Type] == "Simple Sextant" # [StashItem] == "true"
+[Type] == "Cartographer's Chisel" # [StashItem] == "true"
+[Type] == "Journeyman Cartographer's Seal" # [StashItem] == "true"
+[Type] == "Prime Sextant" # [StashItem] == "true"
+[Type] == "Master Cartographer's Seal" # [StashItem] == "true"
+[Type] == "Awakened Sextant" # [StashItem] == "true"
+[Type] == "Prophecy" # [StashItem] == "true"
+[Type] == "Stacked Deck" # [StashItem] == "true"
+[Type] == "Unshaping Orb" # [StashItem] == "true"
+
+// Harbinger currencies
+[Type] == "Orb of Annulment" # [StashItem] == "true" // Orb of Annulment
+[Type] == "Orb of Binding" # [StashItem] == "true" // Orb of Binding
+[Type] == "Orb of Horizons" # [StashItem] == "true" // Orb of Horizons
+[Type] == "Harbinger's Orb" # [StashItem] == "true" // Harbinger's Orb
+[Type] == "Engineer's Orb" # [StashItem] == "true" // Engineer's Orb
+[Type] == "Ancient Orb" # [StashItem] == "true" // Ancient Orb
+[Type] == "Annulment Shard" # [StashItem] == "true" // Annulment Shard
+[Type] == "Binding Shard" # [StashItem] == "true" // Binding Shard
+[Type] == "Horizon Shard" # [StashItem] == "true" // Horizon Shard
+[Type] == "Harbinger's Shard" # [StashItem] == "true" // Harbinger's Shard
+[Type] == "Engineer's Shard" # [StashItem] == "true" // Engineer's Shard
+[Type] == "Ancient Shard" # [StashItem] == "true" // Ancient Shard
+[Type] == "Chaos Shard" # [StashItem] == "true" // Chaos Shard
+[Type] == "Mirror Shard" # [StashItem] == "true" // Mirror Shard
+[Type] == "Exalted Shard" # [StashItem] == "true" // Exalted Shard
+[Type] == "Regal Shard" # [StashItem] == "true" // Regal Shard
+
+[Type] == "Albino Rhoa Feather" # [StashItem] == "true" // Albino Rhoa Feather
+[Type] == "Offering to the Goddess" # [StashItem] == "true" // Just in case bot picks up out of inventory
+
+/////////////////////////////////////////////////////////////////////////////////////
+//                                                                                 //
+//                            CHAOS / REGAL RECIPE                                 //
+//                                                                                 //
+/////////////////////////////////////////////////////////////////////////////////////
+
+// Jewelry lines left here because bot now does chaos recipe on its own, but sometimes we want bot just to pickup specific jewelry pieces.
+
+// Jewelry
+// [Category] == "Belt" && [Rarity] == "Rare" && [ItemLevel] >= "60" # [ForceSell] == "true"
+// [Category] == "Ring" && [Rarity] == "Rare" && [ItemLevel] >= "60" # [ForceSell] == "true"
+// [Category] == "Amulet" && [Rarity] == "Rare" && [ItemLevel] >= "60" # [ForceSell] == "true"
+
+/////////////////////////////////////////////////////////////////////////////////////
+//                                                                                 //
+//                               I N C U R S I O N                                 //
+//                                                                                 //
+/////////////////////////////////////////////////////////////////////////////////////
+
+[Type] == "Stone of Passage" # [StashItem] == "true" // Stone of Passage
+[Type] == "Flashpowder Keg" # [StashItem] == "true" // Flashpowder Keg
+
+[Type] == "Vial of Dominance" # [StashItem] == "true" // Vial of Dominance
+[Type] == "Vial of Summoning" # [StashItem] == "true" // Vial of Summoning
+[Type] == "Vial of Awakening" # [StashItem] == "true" // Vial of Awakening
+[Type] == "Vial of the Ritual" # [StashItem] == "true" // Vial of the Ritual
+[Type] == "Vial of Fate" # [StashItem] == "true" // Vial of Fate
+[Type] == "Vial of Consequence" # [StashItem] == "true" // Vial of Consequence
+[Type] == "Vial of the Ghost" # [StashItem] == "true" // Vial of the Ghost
+[Type] == "Vial of Transcendence" # [StashItem] == "true" // Vial of Transcendence
+[Type] == "Vial of Sacrifice" # [StashItem] == "true" // Vial of Sacrifice
+
+/////////////////////////////////////////////////////////////////////////////////////
+//                                                                                 //
+//                                B E S T I A R Y                                  //
+//                                                                                 //
+/////////////////////////////////////////////////////////////////////////////////////
+
+[Type] == "Bestiary Orb" # [StashItem] == "true" // Stash all Bestiary Orbs
+[Type] == "Imprinted Bestiary Orb" # [StashItem] == "true" // Stash all Imprinted Bestiary Orbs
+
+// Nets
+// [Type] == "Simple Rope Net" # [StashItem] == "true" // Stash all Simple Rope Nets
+// [Type] == "Reinforced Rope Net" # [StashItem] == "true" // Stash all Reinforced Rope Nets
+// [Type] == "Strong Rope Net" # [StashItem] == "true" // Stash all Strong Rope Nets
+// [Type] == "Simple Iron Net" # [StashItem] == "true" // Stash all Simple Iron Nets
+// [Type] == "Reinforced Iron Net" # [StashItem] == "true" // Stash all Reinforced Iron Nets
+// [Type] == "Strong Iron Net" # [StashItem] == "true" // Stash all Strong Iron Nets
+// [Type] == "Simple Steel Net" # [StashItem] == "true" // Stash all Simple Steel Nets
+// [Type] == "Reinforced Steel Net" # [StashItem] == "true" // Stash all Reinforced Steel Nets
+// [Type] == "Strong Steel Net" # [StashItem] == "true" // Stash all Strong Steel Nets
+// [Type] == "Thaumaturgical Net" # [StashItem] == "true" // Stash all Thaumaturgical Nets
+
+/////////////////////////////////////////////////////////////////////////////////////
+//                                                                                 //
+//                                  A B Y S S                                      //
+//                                                                                 //
+/////////////////////////////////////////////////////////////////////////////////////
+
+// Abyss specific items
+// [Type] == "Stygian Vise" && [Rarity] == "Unique" # [StashItem] == "true" // Darkness Enthroned
+
+// [Type] == "Stygian Vise" # [StashItem] == "true" // Stash all Stygian Vises
+// [Type] == "Murderous Eye Jewel" # [StashItem] == "true" // Stash all Murderous Eye Jewels
+// [Type] == "Searching Eye Jewel" # [StashItem] == "true" // Stash all Searching Eye Jewels
+// [Type] == "Hypnotic Eye Jewel" # [StashItem] == "true" //  Stash all Hypnotic Eye Jewels
+// [Type] == "Ghastly Eye Jewel" # [StashItem] == "true" // Stash all Ghastly Eye Jewels
+
+// Rares only
+[Type] == "Stygian Vise" && [Rarity] == "Rare" # [StashItem] == "true"
+[Type] == "Murderous Eye Jewel" && [Rarity] == "Rare" # [StashItem] == "true"
+[Type] == "Searching Eye Jewel" && [Rarity] == "Rare" # [StashItem] == "true"
+[Type] == "Hypnotic Eye Jewel" && [Rarity] == "Rare" # [StashItem] == "true"
+[Type] == "Ghastly Eye Jewel" && [Rarity] == "Rare" # [StashItem] == "true"
+
+/////////////////////////////////////////////////////////////////////////////////////
+//                                                                                 //
+//                              H A R B I N G E R                                  //
+//                                                                                 //
+/////////////////////////////////////////////////////////////////////////////////////
+
+// Pieces are listed just in case bot accidently misclicks
+[Type] == "First Piece of Brutality" # [StashItem] == "true"
+[Type] == "Second Piece of Brutality" # [StashItem] == "true"
+[Type] == "Third Piece of Brutality" # [StashItem] == "true"
+[Type] == "First Piece of Directions" # [StashItem] == "true"
+[Type] == "Second Piece of Directions" # [StashItem] == "true"
+[Type] == "Third Piece of Directions" # [StashItem] == "true"
+[Type] == "First Piece of Focus" # [StashItem] == "true"
+[Type] == "Second Piece of Focus" # [StashItem] == "true"
+[Type] == "Third Piece of Focus" # [StashItem] == "true"
+[Type] == "Fourth Piece of Focus" # [StashItem] == "true"
+[Type] == "First Piece of Storms" # [StashItem] == "true"
+[Type] == "Second Piece of Storms" # [StashItem] == "true"
+[Type] == "Third Piece of Storms" # [StashItem] == "true"
+[Type] == "First Piece of the Arcane" # [StashItem] == "true"
+[Type] == "Second Piece of the Arcane" # [StashItem] == "true"
+[Type] == "Third Piece of the Arcane" # [StashItem] == "true"
+[Type] == "First Piece of Time" # [StashItem] == "true"
+[Type] == "Second Piece of Time" # [StashItem] == "true"
+
+/////////////////////////////////////////////////////////////////////////////////////
+//                                                                                 //
+//                                 B R E A C H                                     //
+//                                                                                 //
+/////////////////////////////////////////////////////////////////////////////////////
+
+[Type] == "Splinter of Chayula" # [StashItem] == "true"
+[Type] == "Splinter of Esh" # [StashItem] == "true"
+[Type] == "Splinter of Tul" # [StashItem] == "true"
+[Type] == "Splinter of Uul-Netol" # [StashItem] == "true"
+[Type] == "Splinter of Xoph" # [StashItem] == "true"
+[Type] == "Blessing of Chayula" # [StashItem] == "true"
+[Type] == "Blessing of Esh" # [StashItem] == "true"
+[Type] == "Blessing of Tul" # [StashItem] == "true"
+[Type] == "Blessing of Uul-Netol" # [StashItem] == "true"
+[Type] == "Blessing of Xoph" # [StashItem] == "true"
+
+/////////////////////////////////////////////////////////////////////////////////////
+//                                                                                 //
+//                               E S S E N C E S                                   //
+//                                                                                 //
+/////////////////////////////////////////////////////////////////////////////////////
+
+// Tier 1
+// [Type] == "Whispering Essence of Hatred" # [StashItem] == "true"
+// [Type] == "Whispering Essence of Woe" # [StashItem] == "true"
+// [Type] == "Whispering Essence of Greed" # [StashItem] == "true"
+// [Type] == "Whispering Essence of Contempt" # [StashItem] == "true"
+
+// Tier 2
+// [Type] == "Muttering Essence of Hatred" # [StashItem] == "true"
+// [Type] == "Muttering Essence of Woe" # [StashItem] == "true"
+// [Type] == "Muttering Essence of Greed" # [StashItem] == "true"
+// [Type] == "Muttering Essence of Contempt" # [StashItem] == "true"
+// [Type] == "Muttering Essence of Sorrow" # [StashItem] == "true"
+// [Type] == "Muttering Essence of Anger" # [StashItem] == "true"
+// [Type] == "Muttering Essence of Torment" # [StashItem] == "true"
+// [Type] == "Muttering Essence of Fear" # [StashItem] == "true"
+
+// Tier 3
+// [Type] == "Weeping Essence of Hatred" # [StashItem] == "true"
+// [Type] == "Weeping Essence of Woe" # [StashItem] == "true"
+// [Type] == "Weeping Essence of Greed" # [StashItem] == "true"
+// [Type] == "Weeping Essence of Contempt" # [StashItem] == "true"
+// [Type] == "Weeping Essence of Sorrow" # [StashItem] == "true"
+// [Type] == "Weeping Essence of Anger" # [StashItem] == "true"
+// [Type] == "Weeping Essence of Torment" # [StashItem] == "true"
+// [Type] == "Weeping Essence of Fear" # [StashItem] == "true"
+// [Type] == "Weeping Essence of Suffering" # [StashItem] == "true"
+// [Type] == "Weeping Essence of Rage" # [StashItem] == "true"
+// [Type] == "Weeping Essence of Wrath" # [StashItem] == "true"
+// [Type] == "Weeping Essence of Doubt" # [StashItem] == "true"
+
+// Tier 4
+// [Type] == "Wailing Essence of Hatred" # [StashItem] == "true"
+// [Type] == "Wailing Essence of Woe" # [StashItem] == "true"
+// [Type] == "Wailing Essence of Greed" # [StashItem] == "true"
+// [Type] == "Wailing Essence of Contempt" # [StashItem] == "true"
+// [Type] == "Wailing Essence of Sorrow" # [StashItem] == "true"
+// [Type] == "Wailing Essence of Anger" # [StashItem] == "true"
+// [Type] == "Wailing Essence of Torment" # [StashItem] == "true"
+// [Type] == "Wailing Essence of Fear" # [StashItem] == "true"
+// [Type] == "Wailing Essence of Suffering" # [StashItem] == "true"
+// [Type] == "Wailing Essence of Rage" # [StashItem] == "true"
+// [Type] == "Wailing Essence of Wrath" # [StashItem] == "true"
+// [Type] == "Wailing Essence of Doubt" # [StashItem] == "true"
+// [Type] == "Wailing Essence of Anguish" # [StashItem] == "true"
+// [Type] == "Wailing Essence of Loathing" # [StashItem] == "true"
+// [Type] == "Wailing Essence of Spite" # [StashItem] == "true"
+// [Type] == "Wailing Essence of Zeal" # [StashItem] == "true"
+
+// Tier 5
+[Type] == "Screaming Essence of Hatred" # [StashItem] == "true"
+[Type] == "Screaming Essence of Woe" # [StashItem] == "true"
+[Type] == "Screaming Essence of Greed" # [StashItem] == "true"
+[Type] == "Screaming Essence of Contempt" # [StashItem] == "true"
+[Type] == "Screaming Essence of Sorrow" # [StashItem] == "true"
+[Type] == "Screaming Essence of Anger" # [StashItem] == "true"
+[Type] == "Screaming Essence of Torment" # [StashItem] == "true"
+[Type] == "Screaming Essence of Fear" # [StashItem] == "true"
+[Type] == "Screaming Essence of Suffering" # [StashItem] == "true"
+[Type] == "Screaming Essence of Rage" # [StashItem] == "true"
+[Type] == "Screaming Essence of Wrath" # [StashItem] == "true"
+[Type] == "Screaming Essence of Doubt" # [StashItem] == "true"
+[Type] == "Screaming Essence of Anguish" # [StashItem] == "true"
+[Type] == "Screaming Essence of Loathing" # [StashItem] == "true"
+[Type] == "Screaming Essence of Spite" # [StashItem] == "true"
+[Type] == "Screaming Essence of Zeal" # [StashItem] == "true"
+[Type] == "Screaming Essence of Misery" # [StashItem] == "true"
+[Type] == "Screaming Essence of Dread" # [StashItem] == "true"
+[Type] == "Screaming Essence of Scorn" # [StashItem] == "true"
+[Type] == "Screaming Essence of Envy" # [StashItem] == "true"
+
+// Tier 6
+[Type] == "Shrieking Essence of Hatred" # [StashItem] == "true"
+[Type] == "Shrieking Essence of Woe" # [StashItem] == "true"
+[Type] == "Shrieking Essence of Greed" # [StashItem] == "true"
+[Type] == "Shrieking Essence of Contempt" # [StashItem] == "true"
+[Type] == "Shrieking Essence of Sorrow" # [StashItem] == "true"
+[Type] == "Shrieking Essence of Anger" # [StashItem] == "true"
+[Type] == "Shrieking Essence of Torment" # [StashItem] == "true"
+[Type] == "Shrieking Essence of Fear" # [StashItem] == "true"
+[Type] == "Shrieking Essence of Suffering" # [StashItem] == "true"
+[Type] == "Shrieking Essence of Rage" # [StashItem] == "true"
+[Type] == "Shrieking Essence of Wrath" # [StashItem] == "true"
+[Type] == "Shrieking Essence of Doubt" # [StashItem] == "true"
+[Type] == "Shrieking Essence of Anguish" # [StashItem] == "true"
+[Type] == "Shrieking Essence of Loathing" # [StashItem] == "true"
+[Type] == "Shrieking Essence of Spite" # [StashItem] == "true"
+[Type] == "Shrieking Essence of Zeal" # [StashItem] == "true"
+[Type] == "Shrieking Essence of Misery" # [StashItem] == "true"
+[Type] == "Shrieking Essence of Dread" # [StashItem] == "true"
+[Type] == "Shrieking Essence of Scorn" # [StashItem] == "true"
+[Type] == "Shrieking Essence of Envy" # [StashItem] == "true"
+
+// Tier 7
+[Type] == "Deafening Essence of Hatred" # [StashItem] == "true"
+[Type] == "Deafening Essence of Woe" # [StashItem] == "true"
+[Type] == "Deafening Essence of Greed" # [StashItem] == "true"
+[Type] == "Deafening Essence of Contempt" # [StashItem] == "true"
+[Type] == "Deafening Essence of Sorrow" # [StashItem] == "true"
+[Type] == "Deafening Essence of Anger" # [StashItem] == "true"
+[Type] == "Deafening Essence of Torment" # [StashItem] == "true"
+[Type] == "Deafening Essence of Fear" # [StashItem] == "true"
+[Type] == "Deafening Essence of Suffering" # [StashItem] == "true"
+[Type] == "Deafening Essence of Rage" # [StashItem] == "true"
+[Type] == "Deafening Essence of Wrath" # [StashItem] == "true"
+[Type] == "Deafening Essence of Doubt" # [StashItem] == "true"
+[Type] == "Deafening Essence of Anguish" # [StashItem] == "true"
+[Type] == "Deafening Essence of Loathing" # [StashItem] == "true"
+[Type] == "Deafening Essence of Spite" # [StashItem] == "true"
+[Type] == "Deafening Essence of Zeal" # [StashItem] == "true"
+[Type] == "Deafening Essence of Misery" # [StashItem] == "true"
+[Type] == "Deafening Essence of Dread" # [StashItem] == "true"
+[Type] == "Deafening Essence of Scorn" # [StashItem] == "true"
+[Type] == "Deafening Essence of Envy" # [StashItem] == "true"
+
+// Tier 8
+[Type] == "Essence of Hysteria" # [StashItem] == "true"
+[Type] == "Essence of Insanity" # [StashItem] == "true"
+[Type] == "Essence of Horror" # [StashItem] == "true"
+[Type] == "Essence of Delirium" # [StashItem] == "true"
+
+[Type] == "Remnant of Corruption" # [StashItem] == "true"
+
+
+/////////////////////////////////////////////////////////////////////////////////////
+//                                                                                 //
+//                              T A L I S M A N                                    //
+//                                                                                 //
+/////////////////////////////////////////////////////////////////////////////////////
+
+// [Category] == "Talisman" # [StashItem] == "true" // Keep all talismans
+// [Category] == "Talisman" && [Rarity] == "Rare" # [StashItem] == "true"// Keep all rare talismans
+[Category] == "Talisman" && [Rarity] == "Unique" # [StashItem] == "true" // Keep all unique talismans
+
+/////////////////////////////////////////////////////////////////////////////////////
+//                                                                                 //
+//                                  G E M S                                        //
+//                                                                                 //
+/////////////////////////////////////////////////////////////////////////////////////
+
+// For quality gem, use the setting Min Gem Quality from Pickit tab of GUI
+
+// White Skill Gem
+
+// [Type] == "Portal" // Drop Only Gem
+// [Type] == "Detonate Mines" // Drop Only Gem
+
+// Red Active Gem Skill
+
+// [Type] == "Abyssal Cry" // Gem
+// [Type] == "Ancestral Protector" // Gem
+// [Type] == "Ancestral Warchief" // Gem
+// [Type] == "Anger" // Gem
+// [Type] == "Animate Guardian" // Gem
+// [Type] == "Cleave" // Gem
+// [Type] == "Decoy Totem" // Gem
+// [Type] == "Determination" // Gem
+// [Type] == "Devouring Totem" // Gem
+// [Type] == "Dominating Blow" // Gem
+// [Type] == "Earthquake" // Gem
+// [Type] == "Enduring Cry" // Gem
+// [Type] == "Flame Totem" // Gem
+// [Type] == "Glacial Hammer" // Gem
+// [Type] == "Ground Slam" // Gem
+// [Type] == "Heavy Strike" // Gem
+// [Type] == "Herald of Ash" // Gem
+// [Type] == "Ice Crash" // Gem
+// [Type] == "Immortal Call" // Gem
+// [Type] == "Infernal Blow" // Gem
+// [Type] == "Leap Slam" // Gem
+// [Type] == "Molten Shell" // Gem
+// [Type] == "Molten Strike" // Gem
+// [Type] == "Punishment" // Gem
+// [Type] == "Purity of Fire" // Gem
+// [Type] == "Rallying Cry" // Gem
+// [Type] == "Reckoning" // Gem
+// [Type] == "Rejuvenation Totem" // Gem
+// [Type] == "Searing Bond" // Gem
+// [Type] == "Shield Charge" // Gem
+// [Type] == "Shockwave Totem" // Gem
+// [Type] == "Static Strike" // Gem
+// [Type] == "Summon Flame Golem" // Gem
+// [Type] == "Summon Stone Golem" // Gem
+// [Type] == "Sunder" // Gem
+// [Type] == "Sweep" // Gem
+// [Type] == "Vengeance" // Gem
+// [Type] == "Vigilant Strike" // Gem
+// [Type] == "Vitality" // Gem
+// [Type] == "Warlord's Mark" // Gem
+
+//Red Support Gem Skill
+
+// [Type] == "Added Fire Damage Support" // Gem
+// [Type] == "Blood Magic Support" // Gem
+// [Type] == "Bloodlust Support" // Gem
+// [Type] == "Brutality Support" // Gem
+// [Type] == "Burning Damage Support" // Gem
+// [Type] == "Cast on Melee Kill Support" // Gem
+// [Type] == "Cast when Damage Taken Support" // Gem
+// [Type] == "Chance to Bleed Support" // Gem
+// [Type] == "Cold to Fire Support" // Gem
+// [Type] == "Damage on Full Life Support" // Gem
+// [Type] == "Elemental Damage with Attacks Support"// Gem
+[Type] == "Empower Support" // Drop Only Gem
+// [Type] == "Endurance Charge on Melee Stun Support" // Gem
+// [Type] == "Fire Penetration Support" // Gem
+// [Type] == "Fortify Support" // Gem
+// [Type] == "Generosity Support" // Gem
+// [Type] == "Increased Duration Support" // Gem
+// [Type] == "Iron Grip Support" // Gem
+// [Type] == "Iron Will Support" // Gem
+[Type] == "Item Quantity Support" // Gem
+// [Type] == "Knockback Support" // Gem
+// [Type] == "Less Duration Support" // Gem
+// [Type] == "Life Gain on Hit Support" // Gem
+// [Type] == "Life Leech Support" // Gem
+// [Type] == "Maim Support" // Gem
+// [Type] == "Melee Physical Damage Support" // Gem
+// [Type] == "Melee Splash Support" // Gem
+// [Type] == "Multistrike Support" // Gem
+// [Type] == "Ranged Attack Totem Support" // Gem
+// [Type] == "Reduced Mana Support" // Gem
+// [Type] == "Spell Totem Support" // Gem
+// [Type] == "Stun Support" // Gem
+// [Type] == "Vile Toxins Support" // Gem
+
+
+// Green Active Gem Skill
+
+// [Type] == "Animate Weapon" // Gem
+// [Type] == "Arctic Armour" // Gem
+// [Type] == "Barrage" // Gem
+// [Type] == "Bear Trap" // Gem
+// [Type] == "Blade Flurry" // Gem
+// [Type] == "Blade Vortex" // Gem
+// [Type] == "Bladefall" // Gem
+// [Type] == "Blast Rain" // Gem
+// [Type] == "Blink Arrow" // Gem
+// [Type] == "Blood Rage" // Gem
+// [Type] == "Burning Arrow" // Gem
+// [Type] == "Caustic Arrow" // Gem
+// [Type] == "Charged Dash" // Gem
+// [Type] == "Cyclone" // Gem
+// [Type] == "Desecrate" // Gem
+// [Type] == "Detonate Dead" // Gem
+// [Type] == "Double Strike" // Gem
+// [Type] == "Dual Strike" // Gem
+// [Type] == "Elemental Hit" // Gem
+// [Type] == "Ethereal Knives" // Gem
+// [Type] == "Explosive Arrow" // Gem
+// [Type] == "Explosive Trap" // Gem (Dex/Int)
+// [Type] == "Fire Trap" // Gem
+// [Type] == "Flamethrower Trap" // Gem (Dex/Int)
+// [Type] == "Flicker Strike" // Gem
+// [Type] == "Freeze Mine" // Gem
+// [Type] == "Frenzy" // Gem
+// [Type] == "Frost Blades" // Gem
+// [Type] == "Grace" // Gem
+// [Type] == "Haste" // Gem
+// [Type] == "Hatred" // Gem
+// [Type] == "Herald of Ice" // Gem
+// [Type] == "Ice Shot" // Gem
+// [Type] == "Ice Trap" // Gem
+// [Type] == "Lacerate" // Gem
+// [Type] == "Lightning Arrow" // Gem
+// [Type] == "Lightning Strike" // Gem
+// [Type] == "Mirror Arrow" // Gem
+// [Type] == "Phase Run" // Gem
+// [Type] == "Poacher's Mark" // Gem
+// [Type] == "Projectile Weakness" // Gem
+// [Type] == "Puncture" // Gem
+// [Type] == "Purity of Ice" // Gem
+// [Type] == "Rain of Arrows " // Gem
+// [Type] == "Reave" // Gem
+// [Type] == "Riposte" // Gem
+// [Type] == "Seismic Trap" // Gem (Dex/Int)
+// [Type] == "Shrapnel Shot" // Gem
+// [Type] == "Siege Ballista" // Gem
+// [Type] == "Smoke Mine" // Gem
+// [Type] == "Spectral Throw" // Gem
+// [Type] == "Split Arrow" // Gem
+// [Type] == "Summon Ice Golem" // Gem
+// [Type] == "Temporal Chains" // Gem
+// [Type] == "Tornado Shot" // Gem
+// [Type] == "Viper Strike" // Gem
+// [Type] == "Whirling Blades" // Gem
+// [Type] == "Wild Strike" // Gem
+
+// Green Support Gem Skill
+
+// [Type] == "Added Cold Damage Support" // Gem
+// [Type] == "Additional Accuracy Support" // Gem
+// [Type] == "Blind Support" // Gem
+// [Type] == "Block Chance Reduction Support" // Gem
+// [Type] == "Cast On Critical Strike Support" // Gem
+// [Type] == "Cast on Death Support" // Gem
+// [Type] == "Chain Support" // Gem
+// [Type] == "Chance to Flee Support" // Gem
+// [Type] == "Charged Traps Support" // Gem (Dex/Int)
+// [Type] == "Cluster Trap Support" // Gem
+// [Type] == "Cold Penetration Support" // Gem
+// [Type] == "Culling Strike Support" // Gem
+// [Type] == "Deadly Ailments Support" // Gem
+[Type] == "Enhance Support" // Drop Only Gem
+// [Type] == "Faster Attacks Support" // Gem
+// [Type] == "Faster Projectiles Support" // Gem
+// [Type] == "Fork Support" // Gem
+// [Type] == "Greater Multiple Projectiles Support" // Gem
+// [Type] == "Hypothermia Support" // Gem
+// [Type] == "Ice Bite Support" // Gem
+// [Type] == "Lesser Multiple Projectiles Support" // Gem
+// [Type] == "Lesser Poison Support" // Gem
+// [Type] == "Mana Leech Support" // Gem
+// [Type] == "Multiple Traps Support" // Gem
+// [Type] == "Physical Projectile Attack Damage Support" // Gem
+// [Type] == "Pierce Support" // Gem
+// [Type] == "Point Blank Support" // Gem
+// [Type] == "Poison Support" // Gem
+// [Type] == "Slower Projectiles Support" // Gem
+// [Type] == "Swift Affliction Support" // Gem
+// [Type] == "Trap Support" // Gem
+// [Type] == "Trap Cooldown Support" // Gem
+// [Type] == "Trap and Mine Damage Support" // Gem
+// [Type] == "Unbound Ailments Support" // Gem
+// [Type] == "Void Manipulation Support" // Gem
+
+// Blue Active Gem Skill
+
+// [Type] == "Arc" // Gem
+// [Type] == "Arctic Breath" // Gem
+// [Type] == "Assassin's Mark" // Gem
+// [Type] == "Ball Lightning" // Gem
+// [Type] == "Blight" // Gem
+// [Type] == "Bone Offering" // Gem
+// [Type] == "Clarity" // Gem
+// [Type] == "Cold Snap" // Gem
+// [Type] == "Conductivity" // Gem
+// [Type] == "Contagion" // Gem
+// [Type] == "Conversion Trap" // Gem
+// [Type] == "Convocation" // Gem
+// [Type] == "Darkpact" // Gem
+// [Type] == "Discharge" // Gem
+// [Type] == "Discipline" // Gem
+// [Type] == "Elemental Weakness" // Gem
+// [Type] == "Enfeeble" // Gem
+// [Type] == "Essence Drain" // Gem
+// [Type] == "Fire Nova Mine" // Gem
+// [Type] == "Fireball" // Gem
+// [Type] == "Firestorm" // Gem
+// [Type] == "Flame Dash" // Gem
+// [Type] == "Flame Surge" // Gem
+// [Type] == "Flameblast" // Gem
+// [Type] == "Flammability" // Gem
+// [Type] == "Flesh Offering" // Gem
+// [Type] == "Freezing Pulse" // Gem
+// [Type] == "Frost Bomb" // Gem
+// [Type] == "Frost Wall" // Gem
+// [Type] == "Frostbite" // Gem
+// [Type] == "Frostbolt" // Gem
+// [Type] == "Glacial Cascade" // Gem
+// [Type] == "Herald of Thunder" // Gem
+// [Type] == "Ice Nova" // Gem
+// [Type] == "Ice Spear" // Gem
+// [Type] == "Incinerate" // Gem
+// [Type] == "Kinetic Blast" // Gem
+// [Type] == "Lightning Spire Trap" // Gem (Int/Dex)
+// [Type] == "Lightning Tendrils" // Gem
+// [Type] == "Lightning Trap" // Gem
+// [Type] == "Lightning Warp" // Gem
+// [Type] == "Magma Orb" // Gem
+// [Type] == "Orb of Storms" // Gem
+// [Type] == "Power Siphon" // Gem
+// [Type] == "Purity of Elements" // Gem
+// [Type] == "Purity of Lightning" // Gem
+// [Type] == "Raise Spectre" // Gem
+// [Type] == "Raise Zombie" // Gem
+// [Type] == "Righteous Fire" // Gem
+// [Type] == "Scorching Ray" // Gem
+// [Type] == "Shock Nova" // Gem
+// [Type] == "Siphoning Trap" // Gem (Int/Dex)
+// [Type] == "Spark" // Gem
+// [Type] == "Spirit Offering" // Gem
+// [Type] == "Storm Burst" // Gem
+// [Type] == "Storm Call" // Gem
+// [Type] == "Summon Chaos Golem" // Gem
+// [Type] == "Summon Lightning Golem" // Gem
+// [Type] == "Summon Raging Spirit" // Gem
+// [Type] == "Summon Skeleton" // Gem
+// [Type] == "Tempest Shield" // Gem
+// [Type] == "Vortex" // Gem
+// [Type] == "Vulnerability" // Gem
+// [Type] == "Wither" // Gem
+// [Type] == "Wrath" // Gem
+
+// Blue Support Gem Skill
+
+// [Type] == "Added Chaos Damage Support" // Drop Only Gem
+// [Type] == "Added Lightning Damage Support" // Gem
+// [Type] == "Blasphemy Support" // Gem
+// [Type] == "Cast when Stunned Support" // Gem
+// [Type] == "Cast while Channelling Support" // Gem
+// [Type] == "Chance to Ignite Support" // Gem
+// [Type] == "Concentrated Effect Support" // Gem
+// [Type] == "Controlled Destruction Support" // Gem
+// [Type] == "Curse on Hit Support" // Gem
+// [Type] == "Decay Support" // Gem
+// [Type] == "Efficacy Support" // Gem
+// [Type] == "Elemental Focus Support" // Gem
+// [Type] == "Elemental Proliferation Support" // Gem
+[Type] == "Enlighten Support" // Drop Only Gem
+// [Type] == "Faster Casting Support" // Gem
+// [Type] == "Immolate Support" // Gem
+// [Type] == "Ignite Proliferation Support" // Gem
+// [Type] == "Increased Area of Effect Support" // Gem
+// [Type] == "Increased Critical Damage Support" // Gem
+// [Type] == "Increased Critical Strikes Support" // Gem
+// [Type] == "Innervate Support" // Gem
+// [Type] == "Item Rarity Support" // Gem
+// [Type] == "Lightning Penetration Support" // Gem
+// [Type] == "Minefield Support" // Gem
+// [Type] == "Minion and Totem Elemental Resistance Support" // Gem
+// [Type] == "Minion Damage Support" // Gem
+// [Type] == "Minion Life Support" // Gem
+// [Type] == "Minion Speed Support" // Gem
+// [Type] == "Power Charge On Critical Support" // Gem
+// [Type] == "Remote Mine Support" // Gem
+// [Type] == "Spell Echo Support" // Gem
+
+// Vaal gems
+
+// [Type] == "Vaal Earthquake" // Gem
+// [Type] == "Vaal Glacial Hammer" // Gem
+// [Type] == "Vaal Ground Slam" // Gem
+// [Type] == "Vaal Immortal Call" // Gem
+// [Type] == "Vaal Impurity of Fire" // Gem (Str/Int)
+// [Type] == "Vaal Lightning Strike" // Gem
+// [Type] == "Vaal Molten Shell" // Gem
+
+// [Type] == "Vaal Blade Vortex" // Gem
+// [Type] == "Vaal Burning Arrow" // Gem
+// [Type] == "Vaal Cyclone" // Gem
+// [Type] == "Vaal Detonate Dead" // Gem
+// [Type] == "Vaal Double Strike" // Gem
+// [Type] == "Vaal Grace" // Gem
+// [Type] == "Vaal Haste" // Gem
+// [Type] == "Vaal Impurity of Ice" // Gem (Dex/Int)
+// [Type] == "Vaal Lightning Strike" // Gem
+// [Type] == "Vaal Rain of Arrows" // Gem
+// [Type] == "Vaal Reave" // Gem
+// [Type] == "Vaal Spectral Throw" // Gem
+
+// [Type] == "Vaal Arc" // Gem
+// [Type] == "Vaal Blight" // Gem
+// [Type] == "Vaal Clarity" // Gem
+// [Type] == "Vaal Cold Snap" // Gem
+// [Type] == "Vaal Discipline" // Gem
+// [Type] == "Vaal Fireball" // Gem
+// [Type] == "Vaal Flameblast" // Gem
+// [Type] == "Vaal Ice Nova" // Gem
+// [Type] == "Vaal Impurity of Lightning" // Gem
+// [Type] == "Vaal Lightning Trap" // Gem
+// [Type] == "Vaal Lightning Warp" // Gem
+// [Type] == "Vaal Power Siphon" // Gem
+// [Type] == "Vaal Righteous Fire" // Gem
+// [Type] == "Vaal Spark" // Gem
+// [Type] == "Vaal Storm Call" // Gem
+// [Type] == "Vaal Summon Skeletons" // Gem
+
+/////////////////////////////////////////////////////////////////////////////////////
+//                                                                                 //
+//                                 C A R D S                                       //
+//                                                                                 //
+/////////////////////////////////////////////////////////////////////////////////////
+ 
+ 
+// Card > Item Gained > Location
+[Category] == "Card" # [StashItem] == "true" // Collect all divination cards
+// [Type] == "Abandoned Wealth" # [ForceSellItem] == "true" // 3x Exalted Orb -- Arsenal (map)
+// [Type] == "The Admirer" # [ForceSellItem] == "true" // Unknown (New Item)
+// [Type] == "The Aesthete" # [ForceSellItem] == "true" // Shavronne Item -- Shavronne of Umbra/Prodigy of Darkness
+[Type] == "Anarchy's Price" # [ForceSellItem] == "true" // Voltaxic Rift (Corrupted)-- Rogue Exiles
+// [Type] == "The Arena Champion" # [ForceSellItem] == "true" // Colosseum Map -- Arena/Pit (map)
+// [Type] == "The Army of Blood" # [ForceSellItem] == "true" // Unknown (New Item)
+// [Type] == "The Artist" # [ForceSellItem] == "true" // Level 4 Enhance (Corrupted) -- Overgrown Ruin/Overgrown Shrine (map)
+// [Type] == "Assassin's Favour" # [ForceSellItem] == "true" // Unique Dagger -- The Marketplace/Arcade/Bazaar (map)
+[Type] == "Audacity" # [ForceSellItem] == "true" // Doryani's Fist (Corrupted) -- Apex of Sacrifice (map)
+// [Type] == "The Avenger" # [ForceSellItem] == "true" // Mjölner (Corrupted) -- Bazaar/Torture Chamber (map)
+// [Type] == "The Battle Born" # [ForceSellItem] == "true" // Unique Axe -- Kaom's Dream/Kaom's Path/Abyss/Volcano (map)
+// [Type] == "The Beast" # [ForceSellItem] == "true" // Unknown (New Item)
+// [Type] == "The Betrayal" # [ForceSellItem] == "true" // Maligaro's Virtuosity -- Broken Bridge/Western Forest/Wetlands (map)
+// [Type] == "The Blazing Fire" # [ForceSellItem] == "true" // Chin Sol -- unknown
+[Type] == "Birth of the Three" # [ForceSellItem] == "true" // Goddess Bound -- Hillock
+// [Type] == "Blind Venture" # [ForceSellItem] == "true" // Unique Ring -- Museum
+// [Type] == "The Body" # [ForceSellItem] == "true" // Unique Chest -- Armourer's Strongbox
+// [Type] == "Boundless Realms" # [ForceSellItem] == "true" // Random Map -- Solaris (zone)
+// [Type] == "Bowyer's Dream" # [ForceSellItem] == "true" //6L Harbinger Bow -- Lord of the Bow
+// [Type] == "The Brittle Emperor" # [ForceSellItem] == "true" // Voll's Devotion (Corrupted) -- Voll
+// [Type] == "The Calling" # [ForceSellItem] == "true" // Beyond Item -- Beyond demons
+[Type] == "Call to the First Ones" # [ForceSellItem] == "true" // Talisman T1 (Corrupted) -- Barrows/Burial Chambers/Spider Forest/Graveyard (map)
+[Type] == "The Carrion Crow" # [ForceSellItem] == "true" // Life Armour -- Aqueduct/Battlefront/City of Sarn/Ebony Barracks/Western Forest/Colonnade/Waterways
+// [Type] == "The Cartographer" #[ForceSellItem] == "true" // 10x Chisel -- Cartographer Strongbox
+// [Type] == "Cartographer's Delight" # [ForceSellItem] == "true" // Map T5 -- The Docks Merc (zone)
+// [Type] == "The Cataclysm" # [ForceSellItem] == "true" // Lvl 21 Spell Gem (Corrupted) -- Corrupted Areas
+// [Type] == "The Catalyst" # [ForceSellItem] == "true" // Vaal Orb -- The Vaal Ruins (map area)
+// [Type] == "The Celestial Justicar" # [ForceSellItem] == "true" // 6L Astral Plate -- Crypt lvl 2, Crypt (map)
+// [Type] == "The Celestial Stone" # [ForceSellItem] == "true" // Unknown (New Item)
+// [Type] == "The Chains that Bind" # [ForceSellItem] == "true" // 6L Body Armour -- Crematorium (map and zone)
+// [Type] == "Chaotic Disposition" # [ForceSellItem] == "true" // 5x Chaos Orbs -- Poorjoy's Asylum (map)
+// [Type] == "The Coming Storm" # [ForceSellItem] == "true" // Lightning Coil -- Wharf/Cemetry/Promenade/Shipyard
+[Type] == "The Conduit" # [ForceSellItem] == "true" // Doryani's Fist -- High Templar/Palace (map)
+// [Type] == "Coveted Possession" # [ForceSellItem] == "true" // 5x Regal Orb -- The Catacombs (zone)/Catacomb (map)
+// [Type] == "The Cursed King" # [ForceSellItem] == "true" // Rigwald's Curse -- Caer Blaidd (map)
+// [Type] == "The Dapper Prodigy" # [ForceSellItem] == "true" // 6L Body Armour -- Residence (map)
+// [Type] == "The Dark Mage" # [ForceSellItem] == "true" // 6L Staff -- Chamber of Sins (zone 1+2)/Overgrown Ruin (map)
+// [Type] == "The Darkest Dream" # [ForceSellItem] == "true" // Unknown (New Item)
+[Type] == "Death" # [ForceSellItem] == "true" // Mon'tregul's Grasp -- Fetid Pool (zone)/Bog/Mud Geyser (map)
+[Type] == "The Demoness" # [ForceSellItem] == "true" // Death's Hand -- Northern Forest (zone)
+[Type] == "Destined to Crumble" # [ForceSellItem] == "true" // Body Armour (rare iLvl 100) -- Museum/Academy (map)
+// [Type] == "The Devastator" # [ForceSellItem] == "true" // Atziri's Disfavour (Corrupted) -- unknown
+// [Type] == "Dialla's Subjugation" # [ForceSellItem] == "true" // Superior Support Gem (23%) -- Temple (map)
+// [Type] == "The Doctor" # [ForceSellItem] == "true" // Headhunter -- Springs (map)
+[Type] == "Doedre's Madness" # [ForceSellItem] == "true" // Doedre Item -- Doedre Darktongue/ Core (map)
+// [Type] == "The Doppelganger" # [ForceSellItem] == "true" // Q20 Mirror Arrow -- Crossroads (zone)
+[Type] == "The Dragon" # [ForceSellItem] == "true" // Coruscating Elixir -- Norther Forest (zone)/ Dark Forest (map)
+// [Type] == "The Dragon's Heart" # [ForceSellItem] == "true" // Level 4 Empower (corrupted) -- Abyss (map)
+// [Type] == "The Dreamland" # [ForceSellItem] == "true" // Unknown (New Item)
+// [Type] == "The Drunken Aristocrat" # [ForceSellItem] == "true" // Divination Distillate -- Sceptre of God (zone)/ Villa (map)
+// [Type] == "Dying Anguish" # [ForceSellItem] == "true" // Lvl 19 Skill Gem -- Marketplace/Docks/Ebony Barracks/City of Sarn (zone)
+// [Type] == "Earth Drinker" # [ForceSellItem] == "true" // Unique Granite Flask - Dunes (map)
+// [Type] == "Emperor's Luck" # [ForceSellItem] == "true" // 5x Currency -- Imperial Gardens (zone)/Courtyard/Orchard (map)
+// [Type] == "Emperor of Purity" # [ForceSellItem] == "true" // 6L Holy Chainmail -- Chamber of Sins (zone) / Overgrown Ruin / Springs (map)
+// [Type] == "The Encroaching Darkness" # [ForceSellItem] == "true" // Map (Corrupted) -- Vaal Ruins (zone/merc)
+// [Type] == "The Endurance" # [ForceSellItem] == "true" // Vivid Crimson Magic Jewel -- Crystal Veins / Mines / Excavation / Quarry (zones)
+// [Type] == "The Enlightened" # [ForceSellItem] == "true" // Lvl 3 Enlighten -- Dry Woods (map)
+// [Type] == "The Ethereal" # [ForceSellItem] == "true" // 6L Vall Regalia -- Apex of Sacrifice
+// [Type] == "The Explorer" # [ForceSellItem] == "true" // Map (corrupted) -- Dread Thicket (zone/merc)/ Thicket (map)
+// [Type] == "The Eye of the Dragon" # [ForceSellItem] == "true" // Jewel (Corrupted) -- unknown
+// [Type] == "The Fathomless Depths" # [ForceSellItem] == "true" // Unknown (New Item)
+[Type] == "The Feast" # [ForceSellItem] == "true" // Romira's Banquet (corrupted) -- Market/Slums/Warehouse Sewers (zone)/Sewer/Waste Pool (map)
+// [Type] == "The Fiend" # [ForceSellItem] == "true" // Headhunter (corrupted) -- Shrine (map)
+// [Type] == "The Fletcher" # [ForceSellItem] == "true" // Drillneck (corrupted) -- Ironpoint the Forsaken
+// [Type] == "The Flora's Gift" # [ForceSellItem] == "true" // 5L Staff -- Tropical Island (map)
+// [Type] == "The Formless Sea" # [ForceSellItem] == "true" // Varunastra -- Reef (map)
+[Type] == "The Forsaken" # [ForceSellItem] == "true" // Umbilicus Immortalis -- Unknown
+// [Type] == "The Fox" # [ForceSellItem] == "true" // Lvl 20 Gem -- Broken Bridge/Crossroads/Fellshrine/Old Fields/Riverways/Western Forest/Wetlands (zone)/Village Ruin (map)
+// [Type] == "The Gambler" # [ForceSellItem] == "true" // Divination Card -- Any map area 
+// [Type] == "The Garish Power" # [ForceSellItem] == "true" // Unique Jewel -- Unknown
+// [Type] == "The Gemcutter" # [ForceSellItem] == "true" // Gemcutter's Prism -- Gemcutter's Strongbox
+// [Type] == "Gemcutter's Promise" # [ForceSellItem] == "true" // Q20 Gem -- Ebony Barracks (zone)/ Collonade/Promenade (map)
+// [Type] == "The Gentleman" # [ForceSellItem] == "true" // Unique Sword (corrupted) -- Slums (zone)/ Ghetto/Precinct (map)
+// [Type] == "Gift of the Gemling Queen" # [ForceSellItem] == "true" // Lvl 20 Support Gem -- Crystal Veins (zone/merc)
+[Type] == "The Gladiator" # [ForceSellItem] == "true" // Nightmare Bascinet -- Daresso's Dream/Grand Arena (zone)/ Arena/Colosseum/Pit (map)
+// [Type] == "Glimmer of Hope" # [ForceSellItem] == "true" // Unique Gold Ring -- Underground River (map)
+// [Type] == "Grave Knowledge" # [ForceSellItem] == "true" // Q20 SRS Gem -- The Crypt (zone/lvl 1/cruel)
+// [Type] == "The Hale Heart" # [ForceSellItem] == "true" // Unknown (New Item)
+// [Type] == "Harmony of Souls" # [ForceSellItem] == "true" // Unknown (New Item)
+// [Type] == "The Harvester" # [ForceSellItem] == "true" // The Harvest (Axe) -- Crossroads (zone)
+// [Type] == "Her Mask" # [ForceSellItem] == "true" // Sacrifice Fragment -- Any Map
+[Type] == "The Hermit" # [ForceSellItem] == "true" // Lifesprig -- Broken Bridge/Crossroads/Dread Thicket/Fellshrine/Northern,Southern,Western Forest/Old Fields/Riverways/Wetlands
+// [Type] == "Heterochromia" # [ForceSellItem] == "true" // Unique Two-Stone Ring -- Gorge (map)
+// [Type] == "The Hoarder" # [ForceSellItem] == "true" // Exalted Orb -- Belly of the Beast (zone/lvl 1,2)/Harvest
+// [Type] == "Hope" # [ForceSellItem] == "true" // Prismatic Ring (corrupted) -- Crypt/Desert/Dunes/Dungeon/Grotto/Pit/Tropical Island (map)
+// [Type] == "House of Mirrors" # [ForceSellItem] == "true" // Mirror of Kilandra -- The Immortal set / Vessel of the Vaal
+// [Type] == "Hubris" # [ForceSellItem] == "true" // Unique Ring -- Jeweller's Strongbox
+// [Type] == "Humility" # [ForceSellItem] == "true" // Tabula Rasa -- Aqueduct (zone)/ Channel/Waterways (map)
+// [Type] == "The Hunger" # [ForceSellItem] == "true" // Taste of Hate -- Belly of Beast (lvl 1)/Harvest (zone)/ Malformation/Phantasmagoria (map)
+// [Type] == "Hunter's Resolve" # [ForceSellItem] == "true" // Unique Bow -- Riverways (zone)/ Springs (map)
+// [Type] == "Hunter's Reward" # [ForceSellItem] == "true" // The Taming -- Grotto (map)
+// [Type] == "The Immortal" # [ForceSellItem] == "true" // House of Mirrors -- Hall of Grandmasters
+// [Type] == "Immortal Resolve" # [ForceSellItem] == "true" // Unknown (New Item)
+// [Type] == "The Incantation" # [ForceSellItem] == "true" // The Whispering Ice -- Western Forest (zone)/ Springs (map)
+[Type] == "The Inoculated" # [ForceSellItem] == "true" // Seraphim's Armour -- Shore (map)
+// [Type] == "The Inventor" # [ForceSellItem] == "true" // 10x Vaal Orb -- Ancient Pyramid (zone)/ Conservatory (map)
+// [Type] == "Jack in the Box" # [ForceSellItem] == "true" // Unique Item -- Battlefront/City of Sarn/Docks/Ebony Barracks/Marketplace/Slums/Warehouse District (zone)/ Aresenal (map)
+[Type] == "The Jester" # [ForceSellItem] == "true" // Merciless One-Hand Weapon -- Unknown
+// [Type] == "The Jeweller's Boon" # [ForceSellItem] == "true" // Unknown (New Item)
+[Type] == "The King's Blade" # [ForceSellItem] == "true" // Bloodthirsty Eternal Sword (66) -- Daresso's Dream (zone)/ Pit (map)
+// [Type] == "The King's Heart" # [ForceSellItem] == "true" // Kaom's Heart -- Abyss/Volcano (map)
+// [Type] == "Lantador's Lost Love" # [ForceSellItem] == "true" // Rare Two-Stone Ring -- Act 1 zones (Cruel)
+// [Type] == "Last Hope" # [ForceSellItem] == "true" // Mortal Hope -- Vaal Temple (map)
+// [Type] == "The Last One Standing" # [ForceSellItem] == "true" // Atziri's Disfavour -- Hall of Grandmasters (map)
+// [Type] == "Left to Fate" # [ForceSellItem] == "true" // Unidentified Map (T16) -- unknown
+[Type] == "The Lich" # [ForceSellItem] == "true" // Midnight Bargain -- Sawbones
+[Type] == "Light and Truth" # [ForceSellItem] == "true" // unique Crystal Sceptre -- Palace Map (map) / Residence Map (map) / Villa Map (map)
+// [Type] == "Lingering Remnants" # [ForceSellItem] == "true" // Vaal Temple Map (corrupted) -- Overgrown Ruin (map)
+// [Type] == "The Lion" # [ForceSellItem] == "true" // Lioneye Unique Item -- Gorge (map)
+[Type] == "The Lord in Black" # [ForceSellItem] == "true" // Magic Ring of Bameth (83) -- Bameth, Shifting Darkness
+// [Type] == "Lost Worlds" # [ForceSellItem] == "true" // T15 Map -- LvL 5+ Zana
+// [Type] == "The Lover" # [ForceSellItem] == "true" // Jewelry (79) -- Graveyard/Maelström of Chaos/Necropolis (map)
+// [Type] == "Loyalty" # [ForceSellItem] == "true" // 3x Fusing -- Den (zone)
+// [Type] == "Lucky Connections" # [ForceSellItem] == "true" // 20x Fusing -- Docks (zone)/ Pier/Shipyard/Wharf (map)
+// [Type] == "Lucky Deck" # [ForceSellItem] == "true" // 10x Stacked Deck -- Jungle Valley / Terrace / Torture Chamber (map)
+[Type] == "The Lunaris Priestess" # [ForceSellItem] == "true" // Sire of Shards -- Lunaris Temple 2 (zone)
+// [Type] == "Lysah's Respite" # [ForceSellItem] == "true" // Unique Agate Amulet -- Unkown
+// [Type] == "The Master" # [ForceSellItem] == "true" // Unknown (New Item)
+// [Type] == "Mawr Blaidd" # [ForceSellItem] == "true" // Eyes of the Greatwolf -- unknown
+// [Type] == "The Mayor" # [ForceSellItem] == "true" // Unknown (New Item)
+// [Type] == "The Mercenary" # [ForceSellItem] == "true" // Unique Shield -- Broken Bridge (zone)/ Coves/Gorge (map)
+[Type] == "Merciless Armament" # [ForceSellItem] == "true" // Magic merciless 2-Handed Weapon (100) -- Colonnade (map)
+[Type] == "The Metalsmith's Gift" # [ForceSellItem] == "true" // Normal Prismatic Ring -- Fetid Pool/Mud Flats (zone)
+// [Type] == "Mitts" # [ForceSellItem] == "true" // Unique Gloves -- Solaris 2 (zone)/ Core/Poorjoy's (map)
+[Type] == "A Mother's Parting Gift" # [ForceSellItem] == "true" // Fertile Mind -- Imperial Gardens (zone)
+// [Type] == "No Traces" # [ForceSellItem] == "true" // 30x Orb of Scouring -- unknown
+[Type] == "The Oath" # [ForceSellItem] == "true" // Death's Oath -- Unknown
+// [Type] == "The Offering" # [ForceSellItem] == "true" // Shavronne's Wrappings -- Shavronne of Umbra
+// [Type] == "The One With All" # [ForceSellItem] == "true" // Le Heup of All (corrupted) -- Tidal Island (zone)
+[Type] == "The Pack Leader" # [ForceSellItem] == "true" // Alpha's Howl -- Dark Forest/Dry Woods/Jungle Valley/Tropical Island (map)
+// [Type] == "The Pact" # [ForceSellItem] == "true" // Pledge of Hands -- Docks (zone)/  Shipyard (map)
+// [Type] == "The Penitent" # [ForceSellItem] == "true" // Unset Ring -- Unknown
+[Type] == "The Poet" # [ForceSellItem] == "true" // Blood of Corruption (corrupted) -- Marketplace (zone)/ Arcade/Bazaar (map)
+// [Type] == "The Polymath" # [ForceSellItem] == "true" // Astramentis -- Unknown
+// [Type] == "The Porcupine" # [ForceSellItem] == "true" // 6L Short Bow -- Hedge Maze (zone)
+// [Type] == "Perfection" # [ForceSellItem] == "true" // Unknown (New Item)
+// [Type] == "Pride Before the Fall" # [ForceSellItem] == "true" // Kaom's Heart (corrupted) -- Climb/Coast/Ledge/Mud Flats/Ship Graveyard/Tidal Island (zone)
+// [Type] == "The Professor" # [ForceSellItem] == "true" // Unknown (New Item)
+[Type] == "Prosperity" # [ForceSellItem] == "true" // Magic Perandus' Gold Ring -- Tidal Island (zone)/ Shore (map)
+// [Type] == "The Queen" # [ForceSellItem] == "true" // Atiziri's Acuity -- Vaults of Atziri (map)
+[Type] == "The Rabid Rhoa" # [ForceSellItem] == "true" // Malicious Gemini Magic Claw (83) - Drought-Maddened Rhoa
+// [Type] == "Rain of Chaos" # [ForceSellItem] == "true" // Chaos Orb -- Crossroads (zone)/ Village Ruin (map)
+// [Type] == "Rain Tempter" # [ForceSellItem] == "true" // Strand Map -- Grotto (map)
+[Type] == "Rats" # [ForceSellItem] == "true" // Rats's Nest -- Marketplace/Warehouse District (zone)/ Arsenal (map)
+// [Type] == "The Realm" # [ForceSellItem] == "true" // Superior Portal -- Unknown
+// [Type] == "The Risk" # [ForceSellItem] == "true" // Ventor's Gamble -- The Gambler Set
+// [Type] == "The Rite of Elements" # [ForceSellItem] == "true" // Unknown (New Item)
+[Type] == "The Road to Power" # [ForceSellItem] == "true" // Runic 1-Handed Weapon (100) -- Fellshrine Ruins (zone)/ Dark Forest/Orchard/Shore/Village Ruin (map)
+// [Type] == "The Ruthless Ceinture" # [ForceSellItem] == "true" // Meginord's Girdle (Corrupted) -- Unknown
+// [Type] == "The Saint's Treasure" # [ForceSellItem] == "true" // 2X Exalted Orbs -- Slums/Warehouse District/Marketplace (zone)
+// [Type] == "The Samurai's Eye" # [ForceSellItem] == "true" // Unknown (New Item)
+[Type] == "The Scarred Meadow" # [ForceSellItem] == "true" // Wake of Destruction -- Old Fields (zone)/ Dry Peninsula (map)
+// [Type] == "The Scavenger" # [ForceSellItem] == "true" // Carcass Jack -- Unknown
+// [Type] == "The Scholar" # [ForceSellItem] == "true" // 40x Wisdom Scrolls -- Archives/Library (zone)/ Academy/Museum (map)
+// [Type] == "Scholar of the Seas" # [ForceSellItem] == "true" // Mao Kun -- Ship Graveyard (zone)/ Coves/Reef (map)
+// [Type] == "The Sephirot" # [ForceSellItem] == "true" // 10x Divine orbs -- God's Chosen (unique monster)
+// [Type] == "Shard of Fate" # [ForceSellItem] == "true" // Magic Vivid Jewel -- Chamber of Sins (zone)
+[Type] == "The Sigil" # [ForceSellItem] == "true" // Unassailable Amulet -- Overgrown Shrine (map)
+[Type] == "The Siren" # [ForceSellItem] == "true" // The Wispering Ice (corrupted) -- Graveyard/Maelström of Chaos/Necropolis (map)
+// [Type] == "The Soul" # [ForceSellItem] == "true" // Soul Taker -- Cemetary (map)
+// [Type] == "The Spark and the Flame" # [ForceSellItem] == "true" // Berek's Respite -- Unknown
+[Type] == "The Spoiled Prince" # [ForceSellItem] == "true" // Dictator's Prophecy Wand (100) -- Museum (map)
+// [Type] == "The Standoff" # [ForceSellItem] == "true" // Unique Rustic Stash -- Unknown
+[Type] == "The Stormcaller" # [ForceSellItem] == "true" // Agnerod Staff -- Torture Chamber (map)
+[Type] == "Struck By Lightning" # [ForceSellItem] == "true" // Random Magic Jewelry -- Castle Ruins or Combine 3 MAgic Items with Electrocuting Prefix
+// [Type] == "The Summoner" # [ForceSellItem] == "true" // Q20 Minion Gem -- Catacombs/Chamber of Sins Lvl 1/2/Crypt Lvl 2/Fetid Pool/Lower Prison/Upper Prison (zone)/ Acton's Nightmare/Coward's Trial/Dungeon/Necropolis (map)
+[Type] == "The Sun" # [ForceSellItem] == "true" // Rise of the Phoenix -- Solaris Lvl 1/2 (zone)/ Temple (map)
+[Type] == "The Surgeon" # [ForceSellItem] == "true" // Magic Surgeon's Flask -- Chamber of Sins Lvl 2 (zone)
+// [Type] == "The Surveyor" # [ForceSellItem] == "true" // T14 Map -- Core/Malformation/Phantasmagoria (map)
+// [Type] == "The Survivalist" # [ForceSellItem] == "true" // 7x Alchemy -- Flooded Depths (zone)
+// [Type] == "The Sword King's Salute" # [ForceSellItem] == "true" // Unknown (New Item)
+[Type] == "The Thaumaturgist" # [ForceSellItem] == "true" // Shavronne's Revelation (corrupted) -- Shrine (map)
+// [Type] == "Three Faces in the Dark" # [ForceSellItem] == "true" // 3x Chaos Orb -- Markeplace/Warehouse District (zone)/ Arsenal/Village Ruin (map)
+// [Type] == "Time-Lost Relic" # [ForceSellItem] == "true" // Unique League Specific Item -- Excavation (map)
+// [Type] == "The Throne" # [ForceSellItem] == "true" // Kaom's Roots (Corrupted) -- Sewer/Wastepool (zone)
+[Type] == "Thunderous Skies" # [ForceSellItem] == "true" // Storm Cloud -- Twilight Strand (Merc Zone)/ Courtyard/Strand (map)
+[Type] == "The Tower" # [ForceSellItem] == "true" // Unique Staff -- Sceptre of God/Upper Sceptre of God (zone)/ Palace/Residence (map)
+// [Type] == "The Traitor" # [ForceSellItem] == "true" // Unique Wand (corrupted) -- Battlefront (zone)/ Promenade (map)
+[Type] == "Tranquility" # [ForceSellItem] == "true" // Voltaxic Rift -- Old Fields (zone)/ Dry Peninsula (map)
+// [Type] == "Treasure Hunter" # [ForceSellItem] == "true" // Vaults of Atziri (corrupted) -- Mines Lvl 1 (zone)/ Excavation (map)
+// [Type] == "Three Voices" # [ForceSellItem] == "true" // Unknown (New Item)
+// [Type] == "The Trial" # [ForceSellItem] == "true" // T15 Map -- Academy/Arid Lake/Bazaar/Canyon/Cells/Crematorium/Jungle Valley/Malformation/Necropolis/Orchard/Plateau/Precinct/Residence/Torture Chamber/Springs/Underground River/Underground Sea/Waste Pool (map)
+[Type] == "Turn the Other Cheek" # [ForceSellItem] == "true" // Pacifism Jewel (corrupted) -- The Library (zone)
+[Type] == "The Twins" # [ForceSellItem] == "true" // Gemini Claw of Celebration (83) -- Palace/Residence/Temple (map)
+[Type] == "The Tyrant" # [ForceSellItem] == "true" // Merciless Weapon (magic) -- Precinct (map)
+// [Type] == "The Undaunted" # [ForceSellItem] == "true" // Unknown (New Item)
+// [Type] == "The Undisputed" # [ForceSellItem] == "true" // Unknown (New Item)
+// [Type] == "The Union" # [ForceSellItem] == "true" // 10x GCP -- Fellshrine Ruins (zone)
+// [Type] == "The Valkyrie" # [ForceSellItem] == "true" // Nemesis Unique -- Rogue Exile
+// [Type] == "The Valley of Steel Boxes" # [ForceSellItem] == "true" // Monstrous Treasure -- Unknown
+// [Type] == "The Vast" # [ForceSellItem] == "true" // Song of the Sirens -- Coves (map)
+// [Type] == "Vinia's Token" # [ForceSellItem] == "true" // 10x Regret -- Crematorium/Lunaris Lvl 1/2 (zone)/ Temple (map)
+[Type] == "The Visionary" # [ForceSellItem] == "true" // Lioneye's Vision -- Arena (map)
+// [Type] == "The Void" # [ForceSellItem] == "true" // ?????
+// [Type] == "Volatile Power" # [ForceSellItem] == "true" // Q20 Vaal Gem (corrupted) -- Crystal Veins/Mines Lvl 1/2 (zones)/ Excavation/Quarry (map)
+[Type] == "The Warden" # [ForceSellItem] == "true" // Rare Amulet (corrupted) -- Lower/Upper Prison (zone)/ Dungeon (map)
+// [Type] == "The Warlord" # [ForceSellItem] == "true" // 6L Coronal Maul (83) -- Arsenal (map)
+[Type] == "The Watcher" # [ForceSellItem] == "true" // Crown of Eyes -- Quarry (map)
+// [Type] == "Wealth and Power" # [ForceSellItem] == "true" // Lvl 4 Enlighten (corrupted) -- Lunaris Lvl 2 (zone)
+[Type] == "The Web" # [ForceSellItem] == "true" // Weapon of Crafting -- Weaver's Chambers (zone) / Jungle Valley (map)
+// [Type] == "The Wind" # [ForceSellItem] == "true" // Windripper -- Jungle Valley (map)
+// [Type] == "The Witch" # [ForceSellItem] == "true" // Unknown (New Item)
+// [Type] == "The Wolf" # [ForceSellItem] == "true" // Rigwald Item -- unknown
+[Type] == "The Wolf's Shadow" # [ForceSellItem] == "true" // Hyaon's Fury -- Underground Sea (map)
+// [Type] == "The Wolven King's Bite" # [ForceSellItem] == "true" // Rigwald's Quill -- Unknown
+// [Type] == "The Wolverine" # [ForceSellItem] == "true" // Unique Claw (corrupted) -- Unknown
+// [Type] == "The Wrath" # [ForceSellItem] == "true" // 10x Chaos -- Cavern of Wrath (zone)
+// [Type] == "The Wretched" # [ForceSellItem] == "true" // Unique Belt -- Catacombs/Cells/Crypt/Dungeon/Overgrown Ruin/Torture Chamber/Vaal Temple (map)
+
+/////////////////////////////////////////////////////////////////////////////////////
+//                                                                                 //
+//                                  M A P S                                        //
+//                                                                                 //
+/////////////////////////////////////////////////////////////////////////////////////
+
+// ID Maps - GUI does this now. 
+// [Category] == "Map" # [map_monsters_life_+%] >= "0" && [StashItem] == "true"
+[Type] == "Divine Vessel" # [StashItem] == "true" // Divine Vessel
+
+// Sac Sets
+[Type] == "Sacrifice at Dawn" # [StashItem] == "true" //Sacrifice map
+[Type] == "Sacrifice at Noon" # [StashItem] == "true" //Sacrifice map
+[Type] == "Sacrifice at Dusk" # [StashItem] == "true" //Sacrifice map
+[Type] == "Sacrifice at Midnight" # [StashItem] == "true" //Sacrifice map
+[Type] == "Mortal Grief" # [StashItem] == "true" //Über map
+[Type] == "Mortal Rage" # [StashItem] == "true" //Über map
+[Type] == "Mortal Ignorance" # [StashItem] == "true" //Über map
+[Type] == "Mortal Hope" # [StashItem] == "true" //Über map
+
+// Take all maps, or comment out if you want to specify which map rarity to pick up below
+[Category] == "Map" # [StashItem] == "true"
+// [Category] == "Map" && [Rarity] == "Normal" # [StashItem] == "true" // Take all normal maps
+// [Category] == "Map" && [Rarity] == "Magic" # [StashItem] == "true" // Take all magic maps
+// [Category] == "Map" && [Rarity] == "Rare" # [StashItem] == "true" // Take all rare maps
+// [Category] == "Map" && [Rarity] == "Unique" # [StashItem] == "true" // Take all unique maps
+
+// Comment out the maps bellow that you DON'T need - Because of value of higher tier maps, recommend taking all T10+ maps
+// Alternative method for running maps is to collect all maps but set map runner ipd to [UpgradeMapTier]
+
+// Tier 1
+// [Type] == "Beach Map" # [StashItem] == "true"
+// [Type] == "Dungeon Map" # [StashItem] == "true"
+// [Type] == "Graveyard Map" # [StashItem] == "true"
+// [Type] == "Lookout Map" # [StashItem] == "true"
+
+// Tier 2
+// [Type] == "Alleyways Map" # [StashItem] == "true"
+// [Type] == "Arid Lake Map" # [StashItem] == "true"
+// [Type] == "Desert Map" # [StashItem] == "true"
+// [Type] == "Flooded Mine Map" # [StashItem] == "true"
+// [Type] == "Marshes Map" # [StashItem] == "true"
+// [Type] == "Pen Map" # [StashItem] == "true"
+
+// Tier 3
+// [Type] == "Arcade Map" # [StashItem] == "true"
+// [Type] == "Burial Chambers Map" # [StashItem] == "true"
+// [Type] == "Cage Map" # [StashItem] == "true"
+// [Type] == "Cells Map" # [StashItem] == "true"
+// [Type] == "Excavation Map" # [StashItem] == "true"
+// [Type] == "Iceberg Map" # [StashItem] == "true"
+// [Type] == "Leyline Map" # [StashItem] == "true"
+// [Type] == "Peninsula Map" # [StashItem] == "true"
+// [Type] == "Port Map" # [StashItem] == "true"
+// [Type] == "Springs Map" # [StashItem] == "true"
+
+// Tier 4
+// [Type] == "Canyon Map" # [StashItem] == "true"
+// [Type] == "Chateau Map" # [StashItem] == "true"
+// [Type] == "City Square Map" # [StashItem] == "true"
+// [Type] == "Courthouse Map" # [StashItem] == "true"
+// [Type] == "Gorge Map" # [StashItem] == "true"
+// [Type] == "Grotto Map" # [StashItem] == "true"
+// [Type] == "Lighthouse Map" # [StashItem] == "true"
+// [Type] == "Relic Chambers Map" # [StashItem] == "true"
+// [Type] == "Strand Map" # [StashItem] == "true"
+// [Type] == "Volcano Map" # [StashItem] == "true"
+
+// Tier 5
+// [Type] == "Ancient City Map" # [StashItem] == "true"
+// [Type] == "Barrows Map" # [StashItem] == "true"
+// [Type] == "Channel Map" # [StashItem] == "true"
+// [Type] == "Conservatory Map" # [StashItem] == "true"
+// [Type] == "Haunted Mansion Map" # [StashItem] == "true"
+// [Type] == "Ivory Temple Map" # [StashItem] == "true"
+// [Type] == "Maze Map" # [StashItem] == "true"
+// [Type] == "Spider Lair Map" # [StashItem] == "true"
+// [Type] == "Sulphur Vents Map" # [StashItem] == "true"
+// [Type] == "Toxic Sewer Map" # [StashItem] == "true"
+
+// Tier 6
+// [Type] == "Academy Map" # [StashItem] == "true"
+// [Type] == "Ashen Wood Map" # [StashItem] == "true"
+// [Type] == "Atoll Map" # [StashItem] == "true"
+// [Type] == "Cemetery Map" # [StashItem] == "true"
+// [Type] == "Fields Map" # [StashItem] == "true"
+// [Type] == "Jungle Valley Map" # [StashItem] == "true"
+// [Type] == "Mausoleum Map" # [StashItem] == "true"
+// [Type] == "Phantasmagoria Map" # [StashItem] == "true"
+// [Type] == "Thicket Map" # [StashItem] == "true"
+// [Type] == "Underground Sea Map" # [StashItem] == "true"
+// [Type] == "Wharf Map" # [StashItem] == "true"
+// [Type] == "Shaped Beach Map" # [StashItem] == "true"
+// [Type] == "Shaped Dungeon Map" # [StashItem] == "true"
+// [Type] == "Shaped Graveyard Map" # [StashItem] == "true"
+// [Type] == "Shaped Lookout Map" # [StashItem] == "true"
+
+// Tier 7
+// [Type] == "Arachnid Nest Map" # [StashItem] == "true"
+// [Type] == "Bazaar Map" # [StashItem] == "true"
+// [Type] == "Bone Crypt Map" # [StashItem] == "true"
+// [Type] == "Coral Ruins Map" # [StashItem] == "true"
+// [Type] == "Dunes Map" # [StashItem] == "true"
+// [Type] == "Gardens Map" # [StashItem] == "true"
+// [Type] == "Lava Chamber Map" # [StashItem] == "true"
+// [Type] == "Ramparts Map" # [StashItem] == "true"
+// [Type] == "Residence Map" # [StashItem] == "true"
+// [Type] == "Tribunal Map" # [StashItem] == "true"
+// [Type] == "Underground River Map" # [StashItem] == "true"
+// [Type] == "Shaped Alleyways Map" # [StashItem] == "true"
+// [Type] == "Shaped Arid Lake Map" # [StashItem] == "true"
+// [Type] == "Shaped Desert Map" # [StashItem] == "true"
+// [Type] == "Shaped Flooded Mine Map" # [StashItem] == "true"
+// [Type] == "Shaped Marshes Map" # [StashItem] == "true"
+// [Type] == "Shaped Pen Map" # [StashItem] == "true"
+
+// Tier 8
+// [Type] == "Armoury Map" # [StashItem] == "true"
+// [Type] == "Courtyard Map" # [StashItem] == "true"
+// [Type] == "Geode Map" # [StashItem] == "true"
+// [Type] == "Infested Valley Map" # [StashItem] == "true"
+// [Type] == "Laboratory Map" # [StashItem] == "true"
+// [Type] == "Mineral Pools Map" # [StashItem] == "true"
+// [Type] == "Mud Geyser Map" # [StashItem] == "true"
+// [Type] == "Overgrown Ruin Map" # [StashItem] == "true"
+// [Type] == "Shore Map" # [StashItem] == "true"
+// [Type] == "Tropical Island Map" # [StashItem] == "true"
+// [Type] == "Vaal Pyramid Map" # [StashItem] == "true"
+// [Type] == "Shaped Arcade Map" # [StashItem] == "true"
+// [Type] == "Shaped Burial Chambers Map" # [StashItem] == "true"
+// [Type] == "Shaped Cage Map" # [StashItem] == "true"
+// [Type] == "Shaped Cells Map" # [StashItem] == "true"
+// [Type] == "Shaped Excavation Map" # [StashItem] == "true"
+// [Type] == "Shaped Iceberg Map" # [StashItem] == "true"
+// [Type] == "Shaped Leyline Map" # [StashItem] == "true"
+// [Type] == "Shaped Peninsula Map" # [StashItem] == "true"
+// [Type] == "Shaped Port Map" # [StashItem] == "true"
+// [Type] == "Shaped Springs Map" # [StashItem] == "true"
+
+// Tier 9
+// [Type] == "Arena Map" # [StashItem] == "true"
+// [Type] == "Estuary Map" # [StashItem] == "true"
+// [Type] == "Moon Temple Map" # [StashItem] == "true"
+// [Type] == "Museum Map" # [StashItem] == "true"
+// [Type] == "Plateau Map" # [StashItem] == "true"
+// [Type] == "Scriptorium Map" # [StashItem] == "true"
+// [Type] == "Sepulchre Map" # [StashItem] == "true"
+// [Type] == "Temple Map" # [StashItem] == "true"
+// [Type] == "Tower Map" # [StashItem] == "true"
+// [Type] == "Vault Map" # [StashItem] == "true"
+// [Type] == "Waste Pool Map" # [StashItem] == "true"
+// [Type] == "Shaped Canyon Map" # [StashItem] == "true"
+// [Type] == "Shaped Chateau Map" # [StashItem] == "true"
+// [Type] == "Shaped City Square Map" # [StashItem] == "true"
+// [Type] == "Shaped Courthouse Map" # [StashItem] == "true"
+// [Type] == "Shaped Gorge Map" # [StashItem] == "true"
+// [Type] == "Shaped Grotto Map" # [StashItem] == "true"
+// [Type] == "Shaped Lighthouse Map" # [StashItem] == "true"
+// [Type] == "Shaped Relic Chambers Map" # [StashItem] == "true"
+// [Type] == "Shaped Strand Map" # [StashItem] == "true"
+// [Type] == "Shaped Volcano Map" # [StashItem] == "true"
+
+// Tier 10
+// [Type] == "Arachnid Tomb Map" # [StashItem] == "true"
+// [Type] == "Belfry Map" # [StashItem] == "true"
+// [Type] == "Bog Map" # [StashItem] == "true"
+// [Type] == "Cursed Crypt Map" # [StashItem] == "true"
+// [Type] == "Orchard Map" # [StashItem] == "true"
+// [Type] == "Pier Map" # [StashItem] == "true"
+// [Type] == "Precinct Map" # [StashItem] == "true"
+// [Type] == "Shipyard Map" # [StashItem] == "true"
+// [Type] == "Siege Map" # [StashItem] == "true"
+// [Type] == "Wasteland Map" # [StashItem] == "true"
+// [Type] == "Shaped Ancient City Map" # [StashItem] == "true"
+// [Type] == "Shaped Barrows Map" # [StashItem] == "true"
+// [Type] == "Shaped Channel Map" # [StashItem] == "true"
+// [Type] == "Shaped Conservatory Map" # [StashItem] == "true"
+// [Type] == "Shaped Haunted Mansion Map" # [StashItem] == "true"
+// [Type] == "Shaped Ivory Temple Map" # [StashItem] == "true"
+// [Type] == "Shaped Maze Map" # [StashItem] == "true"
+// [Type] == "Shaped Spider Lair Map" # [StashItem] == "true"
+// [Type] == "Shaped Sulphur Vents Map" # [StashItem] == "true"
+// [Type] == "Shaped Toxic Sewer Map" # [StashItem] == "true"
+
+// Tier 11
+// [Type] == "Colonnade Map" # [StashItem] == "true"
+// [Type] == "Coves Map" # [StashItem] == "true"
+// [Type] == "Factory Map" # [StashItem] == "true"
+// [Type] == "Lair Map" # [StashItem] == "true"
+// [Type] == "Mesa Map" # [StashItem] == "true"
+// [Type] == "Pit Map" # [StashItem] == "true"
+// [Type] == "Primordial Pool Map" # [StashItem] == "true"
+// [Type] == "Promenade Map" # [StashItem] == "true"
+// [Type] == "Spider Forest Map" # [StashItem] == "true"
+// [Type] == "Waterways Map" # [StashItem] == "true"
+// [Type] == "Shaped Academy Map" # [StashItem] == "true"
+// [Type] == "Shaped Ashen Wood Map" # [StashItem] == "true"
+// [Type] == "Shaped Atoll Map" # [StashItem] == "true"
+// [Type] == "Shaped Cemetery Map" # [StashItem] == "true"
+// [Type] == "Shaped Fields Map" # [StashItem] == "true"
+// [Type] == "Shaped Jungle Valley Map" # [StashItem] == "true"
+// [Type] == "Shaped Mausoleum Map" # [StashItem] == "true"
+// [Type] == "Shaped Phantasmagoria Map" # [StashItem] == "true"
+// [Type] == "Shaped Thicket Map" # [StashItem] == "true"
+// [Type] == "Shaped Underground Sea Map" # [StashItem] == "true"
+// [Type] == "Shaped Wharf Map" # [StashItem] == "true"
+
+// Tier 12
+// [Type] == "Castle Ruins Map" # [StashItem] == "true"
+// [Type] == "Crystal Ore Map" # [StashItem] == "true"
+// [Type] == "Defiled Cathedral Map" # [StashItem] == "true"
+// [Type] == "Necropolis Map" # [StashItem] == "true"
+// [Type] == "Overgrown Shrine Map" # [StashItem] == "true"
+// [Type] == "Racecourse Map" # [StashItem] == "true"
+// [Type] == "Summit Map" # [StashItem] == "true"
+// [Type] == "Torture Chamber Map" # [StashItem] == "true"
+// [Type] == "Villa Map" # [StashItem] == "true"
+// [Type] == "Shaped Arachnid Nest Map" # [StashItem] == "true"
+// [Type] == "Shaped Bazaar Map" # [StashItem] == "true"
+// [Type] == "Shaped Bone Crypt Map" # [StashItem] == "true"
+// [Type] == "Shaped Coral Ruins Map" # [StashItem] == "true"
+// [Type] == "Shaped Dunes Map" # [StashItem] == "true"
+// [Type] == "Shaped Gardens Map" # [StashItem] == "true"
+// [Type] == "Shaped Lava Chamber Map" # [StashItem] == "true"
+// [Type] == "Shaped Ramparts Map" # [StashItem] == "true"
+// [Type] == "Shaped Residence Map" # [StashItem] == "true"
+// [Type] == "Shaped Tribunal Map" # [StashItem] == "true"
+// [Type] == "Shaped Underground River Map" # [StashItem] == "true"
+
+// Tier 13
+// [Type] == "Arsenal Map" # [StashItem] == "true"
+// [Type] == "Caldera Map" # [StashItem] == "true"
+// [Type] == "Core Map" # [StashItem] == "true"
+// [Type] == "Desert Spring Map" # [StashItem] == "true"
+// [Type] == "Ghetto Map" # [StashItem] == "true"
+// [Type] == "Malformation Map" # [StashItem] == "true"
+// [Type] == "Park Map" # [StashItem] == "true"
+// [Type] == "Shrine Map" # [StashItem] == "true"
+// [Type] == "Terrace Map" # [StashItem] == "true"
+// [Type] == "Shaped Armoury Map" # [StashItem] == "true"
+// [Type] == "Shaped Courtyard Map" # [StashItem] == "true"
+// [Type] == "Shaped Geode Map" # [StashItem] == "true"
+// [Type] == "Shaped Infested Valley Map" # [StashItem] == "true"
+// [Type] == "Shaped Laboratory Map" # [StashItem] == "true"
+// [Type] == "Shaped Mineral Pools Map" # [StashItem] == "true"
+// [Type] == "Shaped Mud Geyser Map" # [StashItem] == "true"
+// [Type] == "Shaped Overgrown Ruin Map" # [StashItem] == "true"
+// [Type] == "Shaped Shore Map" # [StashItem] == "true"
+// [Type] == "Shaped Tropical Island Map" # [StashItem] == "true"
+// [Type] == "Shaped Vaal Pyramid Map" # [StashItem] == "true"
+
+// Tier 14
+// [Type] == "Acid Lakes Map" # [StashItem] == "true"
+// [Type] == "Colosseum Map" # [StashItem] == "true"
+// [Type] == "Crimson Temple Map" # [StashItem] == "true"
+// [Type] == "Dark Forest Map" # [StashItem] == "true"
+// [Type] == "Dig Map" # [StashItem] == "true"
+// [Type] == "Palace Map" # [StashItem] == "true"
+// [Type] == "Plaza Map" # [StashItem] == "true"
+// [Type] == "Shaped Arena Map" # [StashItem] == "true"
+// [Type] == "Shaped Estuary Map" # [StashItem] == "true"
+// [Type] == "Shaped Moon Temple Map" # [StashItem] == "true"
+// [Type] == "Shaped Museum Map" # [StashItem] == "true"
+// [Type] == "Shaped Plateau Map" # [StashItem] == "true"
+// [Type] == "Shaped Scriptorium Map" # [StashItem] == "true"
+// [Type] == "Shaped Sepulchre Map" # [StashItem] == "true"
+// [Type] == "Shaped Temple Map" # [StashItem] == "true"
+// [Type] == "Shaped Tower Map" # [StashItem] == "true"
+// [Type] == "Shaped Vault Map" # [StashItem] == "true"
+// [Type] == "Shaped Waste Pool Map" # [StashItem] == "true"
+
+// Tier 15
+// [Type] == "Basilica Map" # [StashItem] == "true"
+// [Type] == "Carcass Map" # [StashItem] == "true"
+// [Type] == "Lava Lake Map" # [StashItem] == "true"
+// [Type] == "Reef Map" # [StashItem] == "true"
+// [Type] == "Sunken City Map" # [StashItem] == "true"
+// [Type] == "Shaped Arachnid Tomb Map" # [StashItem] == "true"
+// [Type] == "Shaped Belfry Map" # [StashItem] == "true"
+// [Type] == "Shaped Bog Map" # [StashItem] == "true"
+// [Type] == "Shaped Cursed Crypt Map" # [StashItem] == "true"
+// [Type] == "Shaped Orchard Map" # [StashItem] == "true"
+// [Type] == "Shaped Pier Map" # [StashItem] == "true"
+// [Type] == "Shaped Precinct Map" # [StashItem] == "true"
+// [Type] == "Shaped Shipyard Map" # [StashItem] == "true"
+// [Type] == "Shaped Siege Map" # [StashItem] == "true"
+// [Type] == "Shaped Wasteland Map" # [StashItem] == "true"
+
+// Tier 16
+// [Type] == "Forge of the Phoenix Map" # [StashItem] == "true"
+// [Type] == "Lair of the Hydra Map" # [StashItem] == "true"
+// [Type] == "Maze of the Minotaur Map" # [StashItem] == "true"
+// [Type] == "Pit of the Chimera Map" # [StashItem] == "true"
+// [Type] == "Vaal Temple Map" # [StashItem] == "true"
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////
+//                                                                                 //
+//                                  SOCKETS                                        //
+//                                                                                 //
+/////////////////////////////////////////////////////////////////////////////////////
+
+// [Sockets] >= "5" && [Linked] >= "5" # [StashItem] =="true" // Keep 5/6L
+[Sockets] == "6" && [Linked] >= "6" # [StashItem] =="true" // Keep 6L6S
+[Sockets] == "6" && [Linked] <= "5" && [Rarity] == "Normal" # [SellUnid] == "true" // Sell 6S Whites
+[Sockets] == "6" && [Linked] <= "5" && [Rarity] == "Magic" # [SellUnid] == "true" // Sell 6S Magic
+// [Sockets] == "6" && [Linked] <= "5" && [Rarity] == "Normal" # [SellUnid] == "true" // Sell 6S Uniques
+
+/////////////////////////////////////////////////////////////////////////////////////
+//                                                                                 //
+//                              C H A N C I N G                                    //
+//                                                                                 //
+/////////////////////////////////////////////////////////////////////////////////////
+
+// [Type] == "Onyx Amulet" # [ChanceItem] == "true" && [Rarity] == "Normal" // Astramentis preferably
+// [Type] == "Slaughter Knife" # [ChanceItem] == "true" && [Rarity] == "Normal" // Bino's
+// [Type] == "Sharkskin Booots" # [ChanceItem] == "true" && [Rarity] == "Normal" // Blood Dance (Vaal Roll +1 Frenzy)
+// [Type] == "Varnished Coat" # [ChanceItem] == "true" && [Rarity] == "Normal" // Carcass Jack
+// [Type] == "Penetrating Arrow Quiver" # [ChanceItem] == "true" && [Rarity] == "Normal" // Drillneck
+// [Type] == "Deicide Mask" # [ChanceItem] == "true" && [Rarity] == "Normal" // Heretic's Veil
+// [Type] == "Glorious Plate" # [ChanceItem] == "true" && [Rarity] == "Normal" // Kaom's Heart
+// [Type] == "Desert Brigandine" # [ChanceItem] == "true" && [Rarity] == "Normal" // Lightning Coil
+// [Type] == "Deerskin Gloves" # [ChanceItem] == "true" && [Rarity] == "Normal" // Maligaro's Virtuosity
+// [Type] == "Gavel" # [ChanceItem] == "true" && [Rarity] == "Normal" // Mjolnir
+// [Type] == "Judgement Staff" # [ChanceItem] == "true" && [Rarity] == "Normal" // Pledge of Hands
+// [Type] == "Titanium Spirit Shield" # [ChanceItem] == "true" && [Rarity] == "Normal" // Rathpith
+// [Type] == "Ursine Pelt" # [ChanceItem] == "true" && [Rarity] == "Normal" // Rat's Nest
+// [Type] == "Granite Flask" # [ChanceItem] == "true" && [Rarity] == "Normal" // Rumi's Concoction
+// [Type] == "Occultist's Vestment" # [ChanceItem] == "true" && [Rarity] == "Normal" // Shavronne's Wrappings
+// [Type] == "Sorcerer Boots" # [ChanceItem] == "true" && [Rarity] == "Normal" // Skyforth
+// [Type] == "Siege Axe" # [ChanceItem] == "true" && [Rarity] == "Normal" // Soul Taker
+// [Type] == "Gold Ring" # [ChanceItem] == "true" && [Rarity] == "Normal" // Ventor's Gamble or Andvarius
+// [Type] == "Prophecy Wand" # [ChanceItem] == "true" && [Rarity] == "Normal" // Void Battery
+// [Type] == "Conjurer Gloves" # [ChanceItem] == "true" && [Rarity] == "Normal" // Voidbringer (Vaal Roll +1 Gems)
+// [Type] == "Spine Bow" # [ChanceItem] == "true" && [Rarity] == "Normal" // Voltaxic Rift
+[Type] == "Studded Belt" # [ChanceItem] == "true" && [Rarity] == "Normal" // Ryslatha's Coil
+[Type] == "Silk Gloves" # [ChanceItem] == "true" && [Rarity] == "Normal" // Asenath's Gentle Touch
+
+//////////////////////////////////////////////
+//                                          //
+//                W H I T E S               //
+//                                          //
+//////////////////////////////////////////////
+
+// [Type] == "Agate Amulet" && [Rarity] == "Normal" # [StashItem] == "true" // Collect for Voll's Devotion - Anarchy/Onslaught Map Mod - Chance in Map
+// [Type] == "Leather Belt" && [Rarity] == "Normal" # [StashItem] == "true" // Collect for Headhunter's
+// [Type] == "Spiked Gloves" # [StashItem] == "true" // Found in Arena, Armoury, Atoll, Canyon, Collonade, Phoenix, Overgrown Shrine, Shaped Mesa, Temple, Underground Sea Maps
+// [Type] == "Gripped Gloves" # [StashItem] == "true" // Found in Cells, Ashen Woods, Racecourse, Quarry
+// [Type] == "Fingerless Silk Gloves" # [StashItem] == "true" // Found in Catacombs, Arachnid, Shore, Coves
+// [Type] == "Two-Toned Boots" # [base_fire_damage_resistance_%] >= "15" && [base_cold_damage_resistance_%] >= "15" && [StashItem] == "true" // Found in Burial Chambers, Canyon, Mesa, Primordial Pool, Vaal City
+// [Type] == "Two-Toned Boots" # [base_fire_damage_resistance_%] >= "15" && [base_lightning_damage_resistance_%] >= "15" && [StashItem] == "true" // Found in Dunes, Peninsula, Ramparts, Strand, Wharf
+// [Type] == "Two-Toned Boots" # [base_lightning_damage_resistance_%] >= "15" && [base_cold_damage_resistance_%] >= "15" && [StashItem] == "true" // Found in Mud Geyser, Spider Forest, Spider Lair, Thicket, Tower 
+// [Type] == "Bone Helmet" # [StashItem] == "true" // Found in Barrows, Bog, Cemetery, Crypt, Museum
+[Type] == "Opal Ring" && [ItemLevel] >= "79" # [StashItem] == "true" // Found in Maze, Plaza, Scriptorium, Colosseum
+[Type] == "Steel Ring" && [ItemLevel] >= "79" # [StashItem] == "true" // Found in Abyss, Lair, Mineral Pools, Volcano
+
+
+//////////////////////////////////////////////
+//                                          //
+//                F L A S K S               //
+//                                          //
+//////////////////////////////////////////////
+
+// [Type] == "Small Life Flask"
+// [Type] == "Medium Life Flask"
+// [Type] == "Large Life Flask"
+// [Type] == "Greater Life Flask"
+// [Type] == "Grand Life Flask"
+// [Type] == "Giant Life Flask"
+// [Type] == "Colossal Life Flask"
+// [Type] == "Sacred Life Flask"
+// [Type] == "Hallowed Life Flask"
+// [Type] == "Sanctified Life Flask"
+// [Type] == "Divine Life Flask"
+// [Type] == "Eternal Life Flask"
+
+// [Type] == "Small Mana Flask"
+// [Type] == "Medium Mana Flask"
+// [Type] == "Large Mana Flask"
+// [Type] == "Greater Mana Flask"
+// [Type] == "Grand Mana Flask"
+// [Type] == "Giant Mana Flask"
+// [Type] == "Colossal Mana Flask"
+// [Type] == "Sacred Mana Flask"
+// [Type] == "Hallowed Mana Flask"
+// [Type] == "Sanctified Mana Flask"
+// [Type] == "Divine Mana Flask"
+// [Type] == "Eternal Mana Flask"
+
+// [Type] == "Small Hybrid Flask"
+// [Type] == "Medium Hybrid Flask"
+// [Type] == "Large Hybrid Flask"
+// [Type] == "Colossal Hybrid Flask"
+// [Type] == "Sacred Hybrid Flask"
+// [Type] == "Hallowed Hybrid Flask"
+
+// [Type] == "Quicksilver Flask"
+// [Type] == "Bismuth Flask"
+// [Type] == "Stibnite Flask"
+// [Type] == "Amethyst Flask"
+// [Type] == "Ruby Flask"
+// [Type] == "Sapphire Flask"
+// [Type] == "Topaz Flask"
+// [Type] == "Silver Flask"
+// [Type] == "Aquamarine Flask"
+// [Type] == "Diamond Flask"
+// [Type] == "Granite Flask"
+// [Type] == "Jade Flask"
+// [Type] == "Quartz Flask"
+// [Type] == "Sulphur Flask"
+// [Type] == "Basalt Flask"
+
+/////////////////////////////////////////////////////////////////////////////////////
+//                                                                                 //
+//                           S C A R A B                                           //
+//                                                                                 //
+/////////////////////////////////////////////////////////////////////////////////////
+
+[Type] == "Gilded Bestiary Scarab" # [StashItem] == "true"
+[Type] == "Gilded Divination Scarab" # [StashItem] == "true"
+[Type] == "Gilded Legion Scarab" # [StashItem] == "true"
+[Type] == "Gilded Sulphite Scarab" # [StashItem] == "true"
+[Type] == "Polished Bestiary Scarab" # [StashItem] == "true"
+[Type] == "Gilded Breach Scarab" # [StashItem] == "true"
+[Type] == "Gilded Cartography Scarab" # [StashItem] == "true"
+[Type] == "Gilded Harbinger Scarab" # [StashItem] == "true"
+[Type] == "Polished Sulphite Scarab" # [StashItem] == "true"
+[Type] == "Gilded Metamorph Scarab" # [StashItem] == "true"
+[Type] == "Gilded Ambush Scarab" # [StashItem] == "true"
+[Type] == "Polished Divination Scarab" # [StashItem] == "true"
+[Type] == "Gilded Elder Scarab" # [StashItem] == "true"
+[Type] == "Polished Legion Scarab" # [StashItem] == "true"
+[Type] == "Rusted Sulphite Scarab" # [StashItem] == "true"
+[Type] == "Rusted Bestiary Scarab" # [StashItem] == "true"
+[Type] == "Gilded Perandus Scarab" # [StashItem] == "true"
+[Type] == "Gilded Reliquary Scarab" # [StashItem] == "true"
+[Type] == "Polished Breach Scarab" # [StashItem] == "true"
+[Type] == "Polished Cartography Scarab" # [StashItem] == "true"
+[Type] == "Polished Metamorph Scarab" # [StashItem] == "true"
+[Type] == "Rusted Legion Scarab" # [StashItem] == "true"
+[Type] == "Gilded Shaper Scarab" # [StashItem] == "true"
+[Type] == "Gilded Torment Scarab" # [StashItem] == "true"
+[Type] == "Polished Ambush Scarab" # [StashItem] == "true"
+[Type] == "Polished Harbinger Scarab" # [StashItem] == "true"
+[Type] == "Polished Perandus Scarab" # [StashItem] == "true"
+[Type] == "Rusted Metamorph Scarab" # [StashItem] == "true"
+
+/////////////////////////////////////////////////////////////////////////////////////
+//                                                                                 //
+//                           F O S S I L                                           //
+//                                                                                 //
+/////////////////////////////////////////////////////////////////////////////////////
+
+[Type] == "Aberrant Fossil" # [StashItem] == "true"
+[Type] == "Aetheric Fossil" # [StashItem] == "true"
+[Type] == "Bloodstained Fossil" # [StashItem] == "true"
+[Type] == "Bound Fossil" # [StashItem] == "true"
+[Type] == "Corroded Fossil" # [StashItem] == "true"
+[Type] == "Dense Fossil" # [StashItem] == "true"
+[Type] == "Enchanted Fossil" # [StashItem] == "true"
+[Type] == "Encrusted Fossil" # [StashItem] == "true"
+[Type] == "Faceted Fossil" # [StashItem] == "true"
+[Type] == "Fractured Fossil" # [StashItem] == "true"
+[Type] == "Frigid Fossil" # [StashItem] == "true"
+[Type] == "Gilded Fossil" # [StashItem] == "true"
+[Type] == "Glyphic Fossil" # [StashItem] == "true"
+[Type] == "Hollow Fossil" # [StashItem] == "true"
+[Type] == "Jagged Fossil" # [StashItem] == "true"
+[Type] == "Lucent Fossil" # [StashItem] == "true"
+[Type] == "Metallic Fossil" # [StashItem] == "true"
+[Type] == "Perfect Fossil" # [StashItem] == "true"
+[Type] == "Prismatic Fossil" # [StashItem] == "true"
+[Type] == "Pristine Fossil" # [StashItem] == "true"
+[Type] == "Sanctified Fossil" # [StashItem] == "true"
+[Type] == "Scorched Fossil" # [StashItem] == "true"
+[Type] == "Serrated Fossil" # [StashItem] == "true"
+[Type] == "Shuddering Fossil" # [StashItem] == "true"
+[Type] == "Tangled Fossil" # [StashItem] == "true"
+
+/////////////////////////////////////////////////////////////////////////////////////
+//                                                                                 //
+//                            D E L I R I U M                                      //
+//                                                                                 //
+/////////////////////////////////////////////////////////////////////////////////////
+
+[Type] == "Small Cluster Jewel" && [Rarity] == "Rare" # [StashItem] == "true"
+[Type] == "Medium Cluster Jewel" && [Rarity] == "Rare" # [StashItem] == "true"
+[Type] == "Large Cluster Jewel" && [Rarity] == "Rare" # [StashItem] == "true"
+[Type] == "Abyssal Delirium Orb" 	# [StashItem] == "true"
+[Type] == "Blighted Delirium Orb" 	# [StashItem] == "true"
+[Type] == "Diviner's Delirium Orb" 	# [StashItem] == "true"
+[Type] == "Fine Delirium Orb" 		# [StashItem] == "true"
+[Type] == "Fossilised Delirium Orb" 	# [StashItem] == "true"
+[Type] == "Imperial Delirium Orb" 	# [StashItem] == "true"
+[Type] == "Portentous Delirium Orb" 	# [StashItem] == "true"
+[Type] == "Singular Delirium Orb" 	# [StashItem] == "true"
+[Type] == "Skittering Delirium Orb" 	# [StashItem] == "true"
+[Type] == "Thaumaturge's Delirium Orb" 	# [StashItem] == "true"
+[Type] == "Timeless Delirium Orb" 	# [StashItem] == "true"
+[Type] == "Whispering Delirium Orb" 	# [StashItem] == "true"
+[Type] == "Amorphous Delirium Orb" 	# [StashItem] == "true"
+[Type] == "Armoursmith's Delirium Orb" 	# [StashItem] == "true"
+[Type] == "Blacksmith's Delirium Orb" 	# [StashItem] == "true"
+[Type] == "Cartographer's Delirium Orb" # [StashItem] == "true"
+[Type] == "Decadent Delirium Orb" 	# [StashItem] == "true"
+[Type] == "Delirium Orb" 		# [StashItem] == "true"
+[Type] == "Foreboding Delirium Orb" 	# [StashItem] == "true"
+[Type] == "Fragmented Delirium Orb" 	# [StashItem] == "true"
+[Type] == "Jeweller's Delirium Orb" 	# [StashItem] == "true"
+[Type] == "Obscured Delirium Orb" 	# [StashItem] == "true"
+[Type] == "Primal Delirium Orb" 	# [StashItem] == "true"
+[Type] == "Simulacrum Splinter" 	# [StashItem] == "true"
+[Type] == "Simulacrum" 			# [StashItem] == "true"
+
+/////////////////////////////////////////////////////////////////////////////////////
+//                                                                                 //
+//                             U N I Q U E  I T E M S                              //
+//                                                                                 //
+/////////////////////////////////////////////////////////////////////////////////////
+
+[Rarity] == "Unique" # [StashItem] == "true" // DO NOT COMMENT THIS LINE: With ForceSellItem there is no need to sell uniques as a general line command, rather by individual lines
+
+
+//////////////////////////////////////////////
+//                                          //
+//                A m u l e t s             //
+//                                          //
+//////////////////////////////////////////////
+ 
+// [Type] == "Agate Amulet" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Aylardex / Extractor Mentis / Shaper's Seed / Voll's Devotion
+// [Type] == "Amber Amulet" && [Rarity] == "Unique" # [ForceSellItem] == "true" // The Anvil / Blood of Corruption / Xoph's Heart / Xoph's Blood
+// [Type] == "Blue Pearl Amulet" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Gloomfang
+// [Type] == "Citrine Amulet" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Daresso's Salute / Eye of Innocence
+// [Type] == "Coral Amulet" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Araku Tiki / Ngamahu Tiki
+// [Type] == "Gold Amulet" && [Rarity] == "Unique" # [ForceSellItem] == "true" // The Ascetic / Demigod's Presence / Ignomon / Winterheart / Bisco's Collar / Effigon
+// [Type] == "Jade Amulet" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Karui Ward / Rashkaldor's Patience / Karui Charge / Halcyon / Pandemonius
+// [Type] == "Jet Amulet" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Talisman of the Victor
+// [Type] == "Lapis Amulet" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Marylene's Fallacy / Stone of Lazhwar / Tear of Purity / Voice of the Storm / Choir of the Storm
+// [Type] == "Lapis Amulet" && [Rarity] == "Unique" #  [base_cast_speed_+%] > "1" && [ForceSellItem] == "true" // Stone of Lazhwar
+// [Type] == "Onyx Amulet" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Astramentis / Carnage Heart / Eye of Chayula / Hinekora's Sight / Impresense / Yoke of Suffering / Presence of Chayula
+// [Type] == "Onyx Amulet" && [Rarity] == "Unique" # [all_attributes_+%] > "10" && [ForceSellItem] == "true" // Carnage Heart
+// [Type] == "Onyx Amulet" && [Rarity] == "Unique" # [cannot_be_stunned] >= "1" && [ForceSellItem] == "true" // Eye of Chayula
+// [Type] == "Onyx Amulet" && [Rarity] == "Unique" # [accuracy_rating] == "1000" && [ForceSellItem] == "true" // Hinekora's Sight
+// [Type] == "Paua Amulet" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Atziri's Foible / Sidhebreath
+// [Type] == "Turquoise Amulet" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Ungil's Harmony / Victario's Acuity / Warped Timepiece / Maligaro's Cruelty
+
+//////////////////////////////////////////////
+//                                          //
+//                B e l t s                 //
+//                                          //
+//////////////////////////////////////////////
+ 
+// [Type] == "Chain Belt" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Ascent from Flesh / Bated Breath / Maligro's Restraint
+// [Type] == "Cloth Belt" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Perandus Blazon / Soulthirst / Sunblast / Soul Tether / Flow Untethered
+// [Type] == "Crystal Belt" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Auxium
+// [Type] == "Heavy Belt" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Belt of the Deceiver / Doryani's Invitation / Dyadian Dawn / Meginord's Girdle / Bisco's Leash
+// [Type] == "Leather Belt" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Headhunter / Immortal Flesh / Wurm's Molt / Umbilicus Immortalis / Cyclopean Coil
+// [Type] == "Rustic Sash" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Faminebind / Feastbind / Prismweave / The Retch / Chains of Time
+// [Type] == "Studded Belt" && [Rarity] == "Unique" # [ForceSellItem] == "true" // The Magnate / Ryslatha's Coil / Tactician / Nomad
+// [Type] == "Stygian Vise" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Darkness Enthroned
+// [Type] == "Vanguard Belt" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Perseverance
+
+ 
+//////////////////////////////////////////////
+//                                          //
+//                R i n g s                 //
+//                                          //
+//////////////////////////////////////////////
+ 
+// [Type] == "Amethyst Ring" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Death Rush / Ming's Heart
+// [Type] == "Coral Ring" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Bloodboil / Kaom's Sign / Kaom's Way / Sibyl's Lament / Winterweave
+// [Type] == "Diamond Ring" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Gifts from Above / Romira's Banquet
+// [Type] == "Gold Ring" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Andvarius / Ventor's Gamble 
+// [Type] == "Iron Ring" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Blackheart / Le Heup of All / Voidheart / Warden's Brand
+// [Type] == "Moonstone Ring" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Heartbound Loop / Shavronne's Revelation / Timeclasp / Valyrium / Timetwist
+// [Type] == "Paua Ring" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Doedre's Damning / Perandus Signet / Praxis
+// [Type] == "Prismatic Ring" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Lori's Lantern / The Taming / Thiefs Torment
+// [Type] == "Ruby Ring" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Emberwake / Mokou's Embrace / Ngamahu's Sign
+// [Type] == "Sapphire Ring" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Dream Fragments / Pyre / Tasalio's Sign / Snakepit
+// [Type] == "Topaz Ring" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Kikazaru / Valako's Sign
+// [Type] == "Two-Stone Ring" && [Rarity] == "Unique" # [fire_damage_+%] >= "1" && [ForceSellItem] == "true" // Berek's Pass 
+// [Type] == "Two-Stone Ring" && [Rarity] == "Unique" # [cold_damage_+%] >= "1" && [ForceSellItem] == "true" // Berek's Grip / Call of the Brotherhood
+// [Type] == "Two-Stone Ring" && [Rarity] == "Unique" # [base_maximum_mana] >= "1" && [ForceSellItem] == "true" // Berek's Respite 
+// [Type] == "Unset Ring" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Brinerot Mark / Malachai's Artifice / Mutewind Seal / The Pariah / Redblade Band / Voideye / Essence Worm / The Hungry Loop / Redblade Band / Angler's Plait
+
+
+//////////////////////////////////////////////
+//                                          //
+//                Q u i v e r s             //
+//                                          //
+//////////////////////////////////////////////
+ 
+[Type] == "Blunt Arrow Quiver" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Maloney's Nightfall
+[Type] == "Broadhead Arrow Quiver" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Rearguard
+[Type] == "Fire Arrow Quiver" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Blackgleam / The Signal Fire
+[Type] == "Penetrating Arrow Quiver" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Drillneck
+[Type] == "Serrated Arrow Quiver" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Craghead / Cragfall
+[Type] == "Sharktooth Arrow Quiver" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Hyrri's Bite
+[Type] == "Spike-Point Arrow Quiver" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Soul Strike / Saemus' Gift
+// [Type] == "Two-Point Arrow Quiver" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Asphyxia's Wrath / Rigwald's Quills / Skirmish
+  
+//////////////////////////////////////////////
+//                                          //
+//                A r m o u r               //
+//                                          //
+//////////////////////////////////////////////
+ 
+// Armour Chests
+[Type] == "Astral Plate" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Death's Oath
+[Type] == "Copper Plate" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Solaris Lorica
+[Type] == "Crusader Plate" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Lioneye's Vision / Iron Heart
+// [Type] == "Gladiator Plate" && [Rarity] == "Unique" # [ForceSellItem] == "true" // The Brass Dome
+// [Type] == "Glorious Plate" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Kaom's Heart 
+[Type] == "Golden Plate" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Greed's Embrace 
+[Type] == "Plate Vest" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Bramble Jack / Wall of Brambles
+
+// Evasion Chests
+// [Type] == "Assassin's Garb" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Cospri's Will
+[Type] == "Buckskin Tunic" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Ashrend
+[Type] == "Coronal Leather" && [Rarity] == "Unique" # [ForceSellItem] == "true" // The Snowblind Grace
+[Type] == "Cutthroat's Garb" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Bronn's Lithe
+[Type] == "Destiny Leather" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Queen of the Forest
+// [Type] == "Exquisite Leather" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Kintsugi / Yreiel's Fostering
+[Type] == "Lacquered Garb" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Cloak of Defiance / Victario's Influence
+// [Type] == "Sharkskin Tunic" && [Rarity] == "Unique" # [ForceSellItem] == "true" // The Rat Cage
+[Type] == "Strapped Leather" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Briskwrap
+[Type] == "Wild Leather" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Foxshade
+// [Type] == "Zodiac Leather" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Hyrri's Ire / Perfect Form
+
+// Energy Shield Chests
+[Type] == "Destroyer Regalia" && [Rarity] == "Unique" # [ForceSellItem] == "true" // The Coming Calamity
+[Type] == "Necromancer Silks" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Vis Mortis
+// [Type] == "Occultist's Vestment" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Shavronne's Wrappings 
+[Type] == "Sage's Robe" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Zahndethus' Cassock / Dialla's Malefaction
+[Type] == "Sage's Robe" && [Rarity] == "Unique" # [chaos_damage_resistance_%] >= "40" && [ForceSellItem] == "true" // Zahndethus' Cassock 
+[Type] == "Savant's Robe" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Cloak of Tawm'r Isley
+[Type] == "Scholar's Robe" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Cloak of Flame
+[Type] == "Spidersilk Robe" && [Rarity] == "Unique" # [ForceSellItem] == "true" // The Covenant / Soul Mantle
+// [Type] == "Vaal Regalia" && [Rarity] == "Unique" # [ForceSellItem] == "true" // The Beast Fur Shawl 
+// [Type] == "Widowsilk Robe" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Infernal Mantle / Doedre's Skin
+
+// Armour & Evasion Chests
+[Type] == "Desert Brigandine" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Lightning Coil 
+[Type] == "Full Dragonscale" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Daresso's Defiance
+[Type] == "Full Scale Armour" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Viper's Scalea
+// [Type] == "Full Wyrmscale" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Belly of the Beast 
+[Type] == "Triumphant Lamellar" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Cherrubim's Maleficence
+
+// Armour & Energy Shield Chests
+[Type] == "Conquest Chainmail" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Kingsguard
+[Type] == "Crusader Chainmail" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Ambu's Charge
+[Type] == "Elegant Ringmail" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Geofri's Sanctuary
+[Type] == "Holy Chainmail" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Voll's Protector 
+[Type] == "Latticed Ringmail" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Icetomb
+[Type] == "Ornate Ringmail" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Lightbane Raiment
+[Type] == "Saintly Chainmail" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Incandescent Heart 
+
+// Evasion & Energy Shield Chests
+// [Type] == "Bone Armour" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Bloodbound
+// [Type] == "Carnal Armour" && [Rarity] == "Unique" # [ForceSellItem] == "true" // The Restless Ward / Shroud of the Lightless
+// [Type] == "Lacquered Garb" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Cloak of Defiance / Victario's Influence 
+// [Type] == "Sadist Garb" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Inpulsa's Broken Heart
+[Type] == "Simple Robe" && [Rarity] == "Unique" # [base_fire_damage_resistance_%] >= "1" && [ForceSellItem] == "true" // Thousand Ribbons
+// [Type] == "Varnished Coat" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Carcass Jack 
+
+ 
+//////////////////////////////////////////////
+//                                          //
+//                 B o o t s                //
+//                                          //
+//////////////////////////////////////////////
+ 
+// Armour Boots
+[Type] == "Plated Greaves" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Stormcharger
+[Type] == "Reinforced Greaves" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Windscream
+[Type] == "Titan Greaves" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Kaom's Roots
+
+// Evasion Boots
+[Type] == "Deerskin Boots" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Deerstalker
+[Type] == "Goathide Boots" && [Rarity] == "Unique" # [dexterity] > "1" && [ForceSellItem] == "true" // Victario's Flight
+// [Type] == "Goathide Boots" && [Rarity] == "Unique" # [strength] >= "20" && [ForceSellItem] == "true" // Abberath's Hooves
+[Type] == "Nubuck Boots" && [Rarity] == "Unique" # [base_item_found_quantity_+%] <= "18" && [ForceSellItem] == "true" // Goldwyrm
+// [Type] == "Rawhide Boots" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Seven-League Step
+[Type] == "Shagreen Boots" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Three-Step Assault
+[Type] == "Sharkskin Boots" && [Rarity] == "Unique" # [ForceSellItem] == "true" // The Blood Dance (Vaal Roll +1 Frenzy)
+
+// Energy Shield Boots
+[Type] == "Arcanist Slippers" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Inya's Epiphany
+[Type] == "Conjurer Boots" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Rainbow Stride (Vaal Roll +1 Gems)
+[Type] == "Scholar Boots" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Shavronne's Pace
+[Type] == "Riveted Boots" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Ralakesh's Impatience
+[Type] == "Silk Slippers" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Bones of Ullr
+// [Type] == "Sorcerer Boots" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Skyforth 
+[Type] == "Velvet Slippers" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Wondertrap
+[Type] == "Wool Shoes" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Wanderlust
+
+// Armour & Evasion Boots
+[Type] == "Bronzescale Boots" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Lioneye's Paws
+[Type] == "Dragonscale Boots" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Darkray Vectors
+[Type] == "Ironscale Boots" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Dusktoe
+
+// Armour & Energy Shield Boots
+// [Type] == "Crusader Boots" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Death's Door
+[Type] == "Legion Boots" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Gang's Momentum
+[Type] == "Mesh Boots" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Wake of Destruction
+[Type] == "Soldier Boots" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Alberon's Warpath
+
+// Evasion & Energy Shield Boots
+[Type] == "Clasped Boots" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Sundance
+[Type] == "Murder Boots" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Bubonic Trail
+[Type] == "Stealth Boots" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Sin Trek
+[Type] == "Strapped Boots" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Nomic's Storm
+
+//////////////////////////////////////////////
+//                                          //
+//                 G l o v e s              //
+//                                          //
+//////////////////////////////////////////////
+ 
+// Armour Gloves
+[Type] == "Ancient Gauntlets" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Winds of Change
+[Type] == "Bronze Gauntlets" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Giantsbane
+[Type] == "Goliath Gauntlets" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Empire's Grasp
+[Type] == "Iron Gauntlets" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Lochtonial Caress  
+[Type] == "Steel Gauntlets" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Meginord's Vise
+[Type] == "Titan Gauntlets" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Veruso's Battering Rams
+// [Type] == "Vaal Gauntlets" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Atziri's Acuity, Doryani's Fist
+
+// Evasion Gloves
+// [Type] == "Deerskin Gloves" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Maligaro's Virtuosity
+[Type] == "Goathide Gloves" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Hrimsorrow / Hrimburn
+[Type] == "Nubuck Gloves" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Oskarm
+
+// Energy Shield Gloves
+[Type] == "Arcanist Gloves" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Grip of the Council
+[Type] == "Conjurer Gloves" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Voidbringer
+[Type] == "Samite Gloves" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Kalisa's Grace
+// [Type] == "Silk Gloves" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Asenath's Gentle Touch
+[Type] == "Velvet Gloves" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Doedre's Tenure
+[Type] == "Wool Gloves" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Sadima's Touch
+// [Type] == "Wool Gloves" && [Rarity] == "Unique" # [base_item_found_quantity_+%] < "16" && [ForceSellItem] == "true" // Perfect Qty Sadima's Touch
+
+// Armour & Evasion Gloves
+[Type] == "Bronzescale Gauntlets" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Slitherpinch / Vaal Caress 
+[Type] == "Dragonscale Gauntlets" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Surgebinders 
+[Type] == "Steelscale Gauntlets" && [Rarity] == "Unique" # [ForceSellItem] == "true"//  Aurseize / Tombfist
+[Type] == "Wyrmscale Gauntlets" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Wyrmsign
+
+// Armour & Energy Shield Gloves
+[Type] == "Chain Gloves" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Shackles of the Wretched
+[Type] == "Crusader Gloves" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Repentance
+[Type] == "Soldier Gloves" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Southbound
+
+// Evasion & Energy Shield Gloves
+[Type] == "Assassin's Mitts" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Snakebite / Blasphemer's Grasp
+[Type] == "Carnal Mitts" && [Rarity] == "Unique" # [ForceSellItem] == "true" // The Embalmer
+// [Type] == "Clasped Mitts" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Shadows and Dust
+[Type] == "Murder Mitts" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Thunderfist / Murder Mitts
+[Type] == "Murder Mitts" && [Rarity] == "Unique" # [attack_speed_+%] > "1" && [ForceSellItem] == "true" // Thunderfist 
+[Type] == "Strapped Mitts" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Facebreaker 
+[Type] == "Wrapped Mitts" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Ondar's Clasp
+ 
+//////////////////////////////////////////////
+//                                          //
+//                 H e l m e t s            //
+//                                          //
+//////////////////////////////////////////////
+ 
+// Armour Helmets
+[Type] == "Close Helmet" && [Rarity] == "Unique" # [ForceSellItem] == "true" // The Baron
+[Type] == "Ezomyte Burgonet" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Abyssus
+[Type] == "Iron Hat" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Ezomyte Peak / Ezomyte Peak
+[Type] == "Samite Helmet" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Hrimnor's Resolve
+
+// Evasion Helmets
+[Type] == "Leather Cap" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Goldrim
+// [Type] == "Leather Cap" && [Rarity] == "Unique" # [resist_all_elements_%] < "40" && [ForceSellItem] == "true" // Perfect Res Goldrim 
+[Type] == "Leather Hood" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Heatshiver 
+[Type] == "Silken Hood" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Starkonja's Head 
+[Type] == "Sinner Tricorne" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Alpha's howl
+[Type] == "Tricorne" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Fairgraves' Tricorne
+[Type] == "Ursine Pelt" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Rat's Nest
+
+// Energy Shield Helmets
+[Type] == "Bone Circlet" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Wraithlord
+[Type] == "Hubris Circlet" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Crown of Eyes 
+[Type] == "Iron Circlet" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Asenath's Mark
+[Type] == "Lunaris Circlet" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Doedre's Scorn
+// [Type] == "Mind Cage" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Rime Gaze / Scold's Bridle
+[Type] == "Necromancer Circlet" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Chitus Apex
+[Type] == "Vine Circlet" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Crown of Thorns
+
+// Armour & Evasion Helmets
+[Type] == "Gilded Sallet" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Deidbell / Deidbellow
+[Type] == "Lacquered Helmet" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Black Sun Crest
+[Type] == "Nightmare Bascinet" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Bringer of Rain / Devoto's Devotion
+[Type] == "Secutor Helm" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Skullhead 
+[Type] == "Visored Sallet" && [Rarity] == "Unique"  # [ForceSellItem] == "true" // The Peregrine 
+// [Type] == "Visored Sallet" && [Rarity] == "Unique" # [base_item_found_rarity_+%] < "30" && [ForceSellItem] == "true" // Perfect The Peregrine 
+
+// Armour & Energy Shield Helemts
+[Type] == "Aventail Helmet" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Mindspiral
+[Type] == "Great Crown" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Geofri's Crest / Lightpoacher
+[Type] == "Great Helmet" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Veil of the Night
+[Type] == "Praetor Crown" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Voll's Vision / Memory Vault / Ahn's Contempt
+[Type] == "Prophet Crown" && [Rarity] == "Unique" # [ForceSellItem] == "true" // The Broken Crown / Speaker's Wreath / The Brine Crown
+[Type] == "Soldier Helmet" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Honourhome
+[Type] == "Zealot Helmet" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Kitava's Thirst
+
+
+// Evasion & Energy Shield Helmets
+[Type] == "Deicide Mask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Heretic's Veil
+[Type] == "Festival Mask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Leer Cast
+[Type] == "Golden Mask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // The Three Dragons
+[Type] == "Harlequin Mask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Mind of the Council
+[Type] == "Iron Mask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Malachai's Simula 
+// [Type] == "Raven Mask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // The Gull
+[Type] == "Regicide Mask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Crown of the Pale King
+[Type] == "Vaal Mask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // The Vertex
+
+//////////////////////////////////////////////
+//                                          //
+//                 S h i e l d s            //
+//                                          //
+//////////////////////////////////////////////
+ 
+// Armour Shields
+// [Type] == "Cedar Tower Shield" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Trolltimber Spire  
+[Type] == "Colossal Tower Shield" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Ahn
+// [Type] == "Ebony Tower Shield" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Chernobog's Pillar / Tukohama's Fortress
+[Type] == "Ebony Tower Shield" && [Rarity] == "Unique" # [base_fire_damage_resistance_%] >= "35" && [ForceSellItem] == "true" // Chernobog's Pillar
+// [Type] == "Ezomyte Tower Shield" && [Rarity] == "Unique" # [ForceSellItem] == "true" // The Surrender / The Anticipation
+[Type] == "Painted Tower Shield" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Redblade Banner
+[Type] == "Pinnacle Tower Shield" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Lioneye's Remorse
+// [Type] == "Rawhide Tower Shield" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Lycosidae
+[Type] == "Reinforced Tower Shield" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Titucius' Span 
+
+// Evasion Shields
+[Type] == "Corrugated Buckler" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Great Old One's Ward
+[Type] == "Enameled Buckler" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Mutewind Pennant
+[Type] == "Golden Buckler" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Atziri's Mirror
+[Type] == "Painted Buckler" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Kaltenhalt / Kaltensoul
+[Type] == "Pine Buckler" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Crest of Perandus 
+[Type] == "Vaal Buckler" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Thousand Teeth Temu
+[Type] == "War Buckler" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Chalice of Horrors / Thirst for Horrors
+
+// Energy Shield Shields
+[Type] == "Brass Spirit Shield" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Sentari's Answer
+[Type] == "Harmonic Spirit Shield" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Malachai's Loop
+[Type] == "Ivory Spirit Shield" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Kongming's Strategem
+[Type] == "Tarnished Spirit Shield" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Matua Tupuna 
+[Type] == "Titanium Spirit Shield" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Rathpith Globe
+// [Type] == "Vaal Spirit Shield" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Esh's Visage
+
+// Armour & Evasion Shields
+[Type] == "Baroque Round Shield" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Daresso's Courage 
+[Type] == "Cardinal Round Shield" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Vix Lunaris
+[Type] == "Rotted Round Shield" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Wheel of the Stormsail
+// [Type] == "Rotted Round Shield" && [Rarity] == "Unique" # [base_item_found_rarity_+%] < "40" && [ForceSellItem] == "true" // Perfect Rarity Wheel of the Stormsail
+[Type] == "Studded Round Shield" && [Rarity] == "Unique" # [ForceSellItem] == "true" // The Deep One's Hide
+
+// Armour & Energy Shield Shields
+[Type] == "Archon Kite Shield" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Broken Faith / Prism Guardian / Invictus Solaris
+[Type] == "Branded Kite Shield" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Saffell's Frame  
+[Type] == "Champion Kite Shield" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Aegis Aurora
+[Type] == "Laminated Kite Shield" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Victario's Charity
+[Type] == "Mosaic Kite Shield" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Rise of the Phoenix 
+[Type] == "Plank Kite Shield" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Springleaf / The Oak
+
+// Evasion & Energy Shield Shields
+[Type] == "Burnished Spiked Shield" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Glitterdisc
+[Type] == "Compound Spiked Shield" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Maligaro's Lens
+[Type] == "Mirrored Spiked Shield" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Leper's Alms
+[Type] == "Supreme Spiked Shield" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Jaws of Agony
+
+//////////////////////////////////////////////
+//                                          //
+//                 W e a p o n s            //
+//                                          //
+//////////////////////////////////////////////
+
+// One-Handed Axes
+[Type] == "Cleaver" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Dreadarc
+[Type] == "Decorative Axe" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Relentless Fury
+[Type] == "Infernal Axe" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Dyadus
+[Type] == "Jade Hatchet" && [Rarity] == "Unique" # [ForceSellItem] == "true" // The Screaming Eagle / The Gryphon
+[Type] == "Royal Axe" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Rigwald's Savagery
+// [Type] == "Siege Axe" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Soul Taker
+[Type] == "Tomahawk" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Moonbender's Wing
+[Type] == "Vaal Hatchet" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Jack, the Axe
+
+// Two-Handed Axes
+[Type] == "Abyssal Axe" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Ngamahu's Flame
+[Type] == "Despot Axe" && [Rarity] == "Unique" # [Elemental DPS] >= "100" &&  [ForceSellItem] == "true" // Debeon's Dirge
+// [Type] == "Despot Axe" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Debeon's Dirge / Kingmaker
+[Type] == "Headsman Axe" && [Rarity] == "Unique" # [ForceSellItem] == "true" // The Blood Reaper
+[Type] == "Karui Chopper" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Kaom's Primacy
+[Type] == "Poleaxe" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Wideswing
+[Type] == "Shadow Axe" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Reaper's Pursuit
+[Type] == "Sundering Axe" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Wings of Entropy
+// [Type] == "Vaal Axe" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Hezmana's Bloodlust / Atziri's Disfavour
+// [Type] == "Void Axe" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Kitava's Feast
+[Type] == "Woodsplitter" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Limbsplit / The Cauteriser
+
+// Bows
+// [Type] == "Assassin Bow" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Chin Sol / Darkscorn / Arborix
+[Type] == "Bone Bow" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Xoph's Inception
+[Type] == "Crude Bow" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Silverbranch
+[Type] == "Death Bow" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Death's Harp / Death's Opus / Iron Commander
+[Type] == "Decimation Bow" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Infractem
+[Type] == "Harbinger Bow" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Nuro's Harp / Slivertongue
+[Type] == "Imperial Bow" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Lioneye's Glare / Windripper
+[Type] == "Imperial Bow" && [Rarity] == "Unique" # [critical_strike_chance_+%] >= "60" && [StashItem] == "true" // Windripper
+[Type] == "Long Bow" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Storm Cloud
+[Type] == "Ranger Bow" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Null's Inclination / Hopeshredder
+[Type] == "Recurve Bow" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Roth's Reach
+[Type] == "Royal Bow" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Doomfletch / Doomfletch's Prism
+[Type] == "Short Bow" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Quill Rain
+[Type] == "Spine Bow" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Reach of the Council / Voltaxic Rift
+
+// Claws
+[Type] == "Awl" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Wildslash
+[Type] == "Eye Gouger" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Essentia Sanguis
+[Type] == "Fright Claw" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Mortem Morsu
+[Type] == "Gut Ripper" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Ornament of the East / Advancing Fortress
+[Type] == "Hellion's Paw" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Bloodseeker
+// [Type] == "Imperial Claw" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Izaro's Dilemma / Touch of Anguish / Hand of Wisdom and Action
+[Type] == "Nailed Fist" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Last Resort
+[Type] == "Terror Claw" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Rive 
+[Type] == "Thresher Claw" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Cybil's Paw
+[Type] == "Throat Stabber" && [Rarity] == "Unique" # [ForceSellItem] == "true" // The Wasp Nest
+[Type] == "Timeworn Claw" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Al Dhih
+[Type] == "Vaal Claw" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Allure   
+
+// Daggers 
+[Type] == "Ambusher" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Taproot
+[Type] == "Boot Blade" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Widowmaker
+[Type] == "Boot Knife" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Ungil's Gauche
+[Type] == "Demon Dagger" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Vulconus
+[Type] == "Fiend Dagger" && [Rarity] == "Unique" # [ForceSellItem] == "true" // The Consuming Dark / Arakaali's Fang
+[Type] == "Fiend Dagger" && [Rarity] == "Unique" # [intelligence] >= "20" && [ForceSellItem] == "true" // The Consuming Dark 
+[Type] == "Flaying Knife" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Mightflay 
+[Type] == "Imperial Skean" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Divinarius / White Wind
+[Type] == "Platinum Kris" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Mark of the Doubting Knight
+[Type] == "Royal Skean" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Heartbreaker
+[Type] == "Skinning Knife" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Goredrill
+[Type] == "Slaughter Knife" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Bino's Kitchen Knife
+[Type] == "Stiletto" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Bloodplay
+
+// Fishing Rods
+// [Type] == "Fishing Rod" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Song of the Sirens / Reefbane
+[Type] == "Fishing Rod" && [Rarity] == "Rare"
+[Type] == "Fishing Rod" && [Rarity] == "Magic"
+[Type] == "Fishing Rod" && [Rarity] == "Normal"
+
+// One-Handed Maces
+[Type] == "Auric Mace" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Callinellus Malleus
+[Type] == "Dream Mace" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Flesh-Eater
+[Type] == "Gavel" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Cameria's Maul / Mjolner
+[Type] == "Nightmare Mace" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Nebuloch
+[Type] == "Ornate Mace" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Frostbreath
+[Type] == "Rock Breaker" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Clayshaper
+[Type] == "Spiked Club" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Gorebreaker
+[Type] == "War Hammer" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Brightbeak / Lavianga's Wisdom
+
+// Sceptres
+[Type] == "Bronze Sceptre" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Axiom Perpetuum
+// [Type] == "Carnal Sceptre" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Breath of the Council
+[Type] == "Crystal Sceptre" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Nycta's Lantern / The Supreme Truth
+[Type] == "Iron Sceptre" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Spine of the First Claimant
+[Type] == "Karui Sceptre" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Death's Hand
+[Type] == "Platinum Sceptre" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Singularity
+[Type] == "Opal Sceptre" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Balefire
+// [Type] == "Ritual Sceptre" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Brutus' Lead Sprinkler
+[Type] == "Shadow Sceptre" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Bitterdream / The Dark Seer
+// [Type] == "Vaal Sceptre" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Doon Cuebiyari / Doryani's Catalyst
+[Type] == "Void Sceptre" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Mon'tregul's Grasp 
+[Type] == "Grinning Fetish" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Earendel's Embrace
+
+// Two-Handed Maces
+[Type] == "Brass Maul" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Geofri's Baptism
+[Type] == "Dread Maul" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Voidhome
+[Type] == "Great Mallet" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Chober Chaber / Trypanon
+[Type] == "Imperial Maul" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Tidebreaker
+[Type] == "Jagged Maul" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Quecholli
+// [Type] == "Karui Maul" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Marohi Erqi
+[Type] == "Sledgehammer" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Hrimnor's Hymn
+// [Type] == "Steelhead" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Jorrhast's Blacksteel
+[Type] == "Terror Maul" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Kongor's Undying Rage 
+
+// Staves
+[Type] == "Coiled Staff" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Dying Breath / Xirgil's Crank
+[Type] == "Gnarled Branch" && [Rarity] == "Unique" # [ForceSellItem] == "true" // The Blood Thorn / Fencoil
+[Type] == "Ezomyte Staff" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Cane of Unravelling
+[Type] == "Imperial Staff" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Agnerod East / Agnerod North / Agnerod South / Agnerod West
+[Type] == "Iron Staff" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Realmshaper
+[Type] == "Judgement Staff" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Hegemony's Era / Pledge of Hands
+[Type] == "Lathi" && [Rarity] == "Unique" # [ForceSellItem] == "true" // The Searing Touch
+[Type] == "Long Staff" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Pillar of the Caged God
+[Type] == "Maelström Staff" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Taryn's Shiver
+[Type] == "Military Staff" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Tremor Rod
+[Type] == "Primordial Staff" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Femurs of the Saints
+[Type] == "Royal Staff" && [Rarity] == "Unique" # [ForceSellItem] == "true" // The Stormheart
+[Type] == "Serpentine Staff" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Sire of Shards
+[Type] == "Vile Staff" && [Rarity] == "Unique" # [ForceSellItem] == "true" // The Whispering Ice 
+
+// Generic One-Handed Swords
+[Type] == "Corsair Sword" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Ichimonji
+[Type] == "Dusk Blade" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Ephemeral Edge
+[Type] == "Elder Sword" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Innsbury Edge
+[Type] == "Elegant Sword" && [Rarity] == "Unique" # [ForceSellItem] == "true" // The Goddess Scorned / Lakishu's Blade
+// [Type] == "Eternal Sword" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Dreamfeather / The Goddess Unleashed / Grelwood Shank / Beltimber Blade
+[Type] == "Ezomyte Blade" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Kondo's Pride
+[Type] == "Gladius" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Scaeva
+[Type] == "Legion Sword" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Hyaon's Fury
+[Type] == "Midnight Blade" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Rigwald's Command / Ahn's Might
+[Type] == "Rusted Sword" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Redbeak
+[Type] == "Sabre" && [Rarity] == "Unique" # [ForceSellItem] == "true" // The Princess
+[Type] == "Twilight Blade" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Prismatic Eclipse
+[Type] == "Vaal Blade" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Rebuke of the Vaal / Varunastra
+[Type] == "War Sword" && [Rarity] == "Unique" # [ForceSellItem] == "true" // The Tempestuous Steel
+
+// Thrusting Blades
+[Type] == "Antique Rapier" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Ewar's Mirage
+[Type] == "Basket Rapier" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Aurumvorax
+[Type] == "Elegant Foil" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Chitus' Needle
+[Type] == "Estoc" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Daresso's Passion
+[Type] == "Jagged Foil" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Fidelitas' Spike
+// [Type] == "Jewelled Foil" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Cospri's Malice
+[Type] == "Whalebone Rapier" && [Rarity] == "Unique" # [ForceSellItem] == "true" // The Goddess Bound
+
+// Two-Handed Swords
+[Type] == "Bastard Sword" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Shiversting
+[Type] == "Etched Greatsword" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Edge of Madness
+[Type] == "Highland Blade" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Rigwald's Charge
+// [Type] == "Infernal Sword" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Oro's Sacrifice / Starforge
+[Type] == "Lion Sword" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Doomsower
+[Type] == "Ornate Sword" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Queen's Decree
+[Type] == "Reaver Sword" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Dancing Dervish / Hiltless
+[Type] == "Tiger Sword" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Terminus Est
+
+// Wands
+[Type] == "Carved Wand" && [Rarity] == "Unique" # [Elemental DPS] >= "1" && [ForceSellItem] == "true" // Storm Prism
+// [Type] == "Carved Wand" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Storm Prism / The Poet's Pen
+[Type] == "Crystal Wand" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Eclipse Solaris
+[Type] == "Demon's Horn" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Obliteration
+[Type] == "Driftwood Wand" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Lifesprig
+[Type] == "Engraved Wand" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Midnight Bargain
+[Type] == "Goat's Horn" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Abberath's Horn
+[Type] == "Imbued Wand" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Moonsorrow
+[Type] == "Opal Wand" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Apep's Rage
+// [Type] == "Prophecy Wand" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Void Battery
+[Type] == "Quartz Wand" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Ashcaller
+[Type] == "Sage Wand" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Twyzel / Shade of Solaris
+[Type] == "Spiraled Wand" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Reverberation Rod
+[Type] == "Tornado Wand" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Piscator's Vigil / Shimmeron
+
+// Life/Mana Flasks
+// [Type] == "Sanctified Life Flask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Blood of the Karui
+// Type] == "Grand Mana Flask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Zerphi's Last Breath
+[Type] == "Greater Mana Flask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Doedre's Elixir
+[Type] == "Hallowed Hybrid Flask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // The Writhing Jar
+// [Type] == "Sanctified Mana Flask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Lavianga's Spirit
+[Type] == "Large Hybrid Flask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Divination Distillate
+
+// Utility Flasks
+[Type] == "Amethyst Flask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Atziri's Promise
+[Type] == "Diamond Flask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Coralito's Signature 
+// [Type] == "Granite Flask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Lion's Roar / Rumi's Concoction 
+[Type] == "Granite Flask" && [Rarity] == "Unique" # [local_unique_flask_block_%_while_healing] >= "1" && [ForceSellItem] == "true" // Rumi's Concoction 
+[Type] == "Quartz Flask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Forbidden Taste
+[Type] == "Quicksilver Flask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Rotgut
+[Type] == "Ruby Flask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Coruscating Elixir
+// [Type] == "Sapphire Flask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Taste of Hate
+[Type] == "Silver Flask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Kiara's Determination
+// [Type] == "Stibnite Flask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Witchfire Brew Stibnite Flask / Sin's REbirth
+[Type] == "Sulphur Flask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // The Sorrow of the Divine / The Overflowing Chalice
+// [Type] == "Topaz Flask" && [Rarity] == "Unique" # [ForceSellItem] == "true" // Vessel of Vinktar
