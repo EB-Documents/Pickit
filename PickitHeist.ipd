@@ -1,4 +1,5 @@
-// Custom pickit by pincette, ver.1.00
+// Custom pickit by pincette, ver.1.01
+// Updated to Heist League - EB treats Contracts and Blueprints as currency so we don't need to add it. Did minor changes to essences
 
 // You'll find the item names list in the ItemNameList.txt file, in the main bot folder, if some name are missing, please send them to us in pm and I'll add them to upcoming versions.
 // You'll find the mods list in the ModsList.html file, in the main bot folder, remember to only use expressions from the right (ie. local_minimum_added_physical_damage, base_maximum_energy_shield, ...). 
@@ -444,22 +445,22 @@
 // [Type] == "Weeping Essence of Doubt" # [StashItem] == "true"
 
 // Tier 4
-// [Type] == "Wailing Essence of Hatred" # [StashItem] == "true"
-// [Type] == "Wailing Essence of Woe" # [StashItem] == "true"
-// [Type] == "Wailing Essence of Greed" # [StashItem] == "true"
-// [Type] == "Wailing Essence of Contempt" # [StashItem] == "true"
-// [Type] == "Wailing Essence of Sorrow" # [StashItem] == "true"
-// [Type] == "Wailing Essence of Anger" # [StashItem] == "true"
-// [Type] == "Wailing Essence of Torment" # [StashItem] == "true"
-// [Type] == "Wailing Essence of Fear" # [StashItem] == "true"
-// [Type] == "Wailing Essence of Suffering" # [StashItem] == "true"
-// [Type] == "Wailing Essence of Rage" # [StashItem] == "true"
-// [Type] == "Wailing Essence of Wrath" # [StashItem] == "true"
-// [Type] == "Wailing Essence of Doubt" # [StashItem] == "true"
-// [Type] == "Wailing Essence of Anguish" # [StashItem] == "true"
-// [Type] == "Wailing Essence of Loathing" # [StashItem] == "true"
-// [Type] == "Wailing Essence of Spite" # [StashItem] == "true"
-// [Type] == "Wailing Essence of Zeal" # [StashItem] == "true"
+[Type] == "Wailing Essence of Hatred" # [StashItem] == "true"
+[Type] == "Wailing Essence of Woe" # [StashItem] == "true"
+[Type] == "Wailing Essence of Greed" # [StashItem] == "true"
+[Type] == "Wailing Essence of Contempt" # [StashItem] == "true"
+[Type] == "Wailing Essence of Sorrow" # [StashItem] == "true"
+[Type] == "Wailing Essence of Anger" # [StashItem] == "true"
+[Type] == "Wailing Essence of Torment" # [StashItem] == "true"
+[Type] == "Wailing Essence of Fear" # [StashItem] == "true"
+[Type] == "Wailing Essence of Suffering" # [StashItem] == "true"
+[Type] == "Wailing Essence of Rage" # [StashItem] == "true"
+[Type] == "Wailing Essence of Wrath" # [StashItem] == "true"
+[Type] == "Wailing Essence of Doubt" # [StashItem] == "true"
+[Type] == "Wailing Essence of Anguish" # [StashItem] == "true"
+[Type] == "Wailing Essence of Loathing" # [StashItem] == "true"
+[Type] == "Wailing Essence of Spite" # [StashItem] == "true"
+[Type] == "Wailing Essence of Zeal" # [StashItem] == "true"
 
 // Tier 5
 [Type] == "Screaming Essence of Hatred" # [StashItem] == "true"
