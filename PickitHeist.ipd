@@ -1436,7 +1436,6 @@
 // [Type] == "Conjurer Gloves" # [ChanceItem] == "true" && [Rarity] == "Normal" // Voidbringer (Vaal Roll +1 Gems)
 // [Type] == "Spine Bow" # [ChanceItem] == "true" && [Rarity] == "Normal" // Voltaxic Rift
 [Type] == "Studded Belt" # [ChanceItem] == "true" && [Rarity] == "Normal" // Ryslatha's Coil
-[Type] == "Silk Gloves" # [ChanceItem] == "true" && [Rarity] == "Normal" // Asenath's Gentle Touch
 
 //////////////////////////////////////////////
 //                                          //
